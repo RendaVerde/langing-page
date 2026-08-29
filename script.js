@@ -1,6 +1,10 @@
 const CONFIG = {
   webhookUrl: "",
+
   checkoutUrl: "https://expansao.igreenenergy.com.br/?id=29284&checkout=true",
+
+  // Somente números: DDI + DDD + número
+  whatsappNumber: "5527988021747",
 };
 
 // -------------------------
@@ -87,21 +91,61 @@ function scoreProfile() {
   return score;
 }
 
+function createWhatsAppLink(lead) {
+  let finalMessage;
+
+  if (lead.momento === "Estou pronto para ativar a licença") {
+    finalMessage =
+      "Estou interessado em ativar a licença e gostaria de tirar uma dúvida antes de concluir.";
+  } else if (lead.momento === "Quero começar ainda este mês") {
+    finalMessage =
+      "Quero começar ainda este mês e gostaria de entender os próximos passos.";
+  } else {
+    finalMessage =
+      "Gostaria de conhecer melhor a oportunidade antes de decidir.";
+  }
+
+  const message = [
+    "Olá! Fiz a pré-avaliação para a oportunidade de Licenciado iGreen.",
+    "",
+    `Nome: ${lead.nome}`,
+    `Cidade: ${lead.cidade}`,
+    `Objetivo: ${lead.objetivo || "-"}`,
+    `Tempo disponível: ${lead.tempo || "-"}`,
+    `Perfil comercial: ${lead.perfil || "-"}`,
+    `Momento: ${lead.momento || "-"}`,
+    `Score: ${lead.score || 0}`,
+    "",
+    finalMessage,
+  ].join("\n");
+
+  return (
+    `https://wa.me/${CONFIG.whatsappNumber}` +
+    `?text=${encodeURIComponent(message)}`
+  );
+}
+
 async function submitLead() {
   const nome = document.getElementById("nome");
   const whats = document.getElementById("whats");
   const cidade = document.getElementById("cidade");
   const email = document.getElementById("email");
   const momento = document.getElementById("momento");
+
   const params = new URLSearchParams(window.location.search);
+
+  const score = scoreProfile();
 
   const lead = {
     ...answers,
+
     nome: nome?.value.trim() || "",
     whatsapp: whats?.value.trim() || "",
     cidade: cidade?.value.trim() || "",
     email: email?.value.trim() || "",
     momento: momento?.value || "",
+    score: score,
+    quiz_completed: true,
     page: window.location.href,
     utm_source: params.get("utm_source") || "",
     utm_medium: params.get("utm_medium") || "",
@@ -112,18 +156,53 @@ async function submitLead() {
     created_at: new Date().toISOString(),
   };
 
+  /*
+   * VALIDAÇÃO
+   */
   if (!lead.nome || !lead.whatsapp || !lead.cidade || !lead.momento) {
     showToast("Preencha nome, WhatsApp, cidade e momento.");
+
     return;
   }
 
+  /*
+   * DEFINE O CAMINHO DO LEAD
+   */
+
+  const wantsMoreInformation =
+    lead.momento === "Quero conhecer antes de decidir";
+
+  lead.destination = wantsMoreInformation ? "whatsapp" : "activation";
+
+  /*
+   * SALVA LOCALMENTE
+   */
+
   localStorage.setItem("igreen_lead_last", JSON.stringify(lead));
+
+  /*
+   * HISTÓRICO LOCAL
+   */
+
+  const savedLeads = JSON.parse(localStorage.getItem("igreen_leads") || "[]");
+
+  savedLeads.push(lead);
+
+  localStorage.setItem("igreen_leads", JSON.stringify(savedLeads));
+
+  /*
+   * ENVIA PARA WEBHOOK / N8N / CRM
+   */
 
   if (CONFIG.webhookUrl) {
     try {
       await fetch(CONFIG.webhookUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
         body: JSON.stringify(lead),
       });
     } catch (error) {
@@ -131,26 +210,84 @@ async function submitLead() {
     }
   }
 
-  const score = scoreProfile();
-  const resultTitle = document.getElementById("resultTitle");
-  const resultText = document.getElementById("resultText");
-  const checkoutBtn = document.getElementById("checkoutBtn");
+  /*
+   * TELAS DE RESULTADO
+   */
 
-  if (resultTitle) {
-    resultTitle.textContent =
-      score >= 5
-        ? "Seu perfil mostra boa aderência inicial ao modelo."
-        : score >= 3
-          ? "Seu perfil tem pontos de aderência que vale explorar."
-          : "Vale conhecer o modelo com calma antes de decidir.";
+  const whatsappPath = document.getElementById("whatsappPath");
+
+  const activationPath = document.getElementById("activationPath");
+
+  /*
+   * =========================================
+   * CAMINHO WHATSAPP
+   * =========================================
+   */
+
+  if (wantsMoreInformation) {
+    if (whatsappPath) whatsappPath.hidden = false;
+
+    if (activationPath) activationPath.hidden = true;
+
+    const whatsappResultText = document.getElementById("whatsappResultText");
+
+    if (whatsappResultText) {
+      whatsappResultText.textContent = `${lead.nome}, registramos sua pré-avaliação. Agora você pode conversar com um especialista e entender a oportunidade com mais detalhes.`;
+    }
+
+    const whatsappBtn = document.getElementById("whatsappBtn");
+
+    if (whatsappBtn) {
+      whatsappBtn.href = createWhatsAppLink(lead);
+    }
+  } else {
+    /*
+     * =========================================
+     * CAMINHO ATIVAÇÃO
+     * =========================================
+     */
+    if (whatsappPath) whatsappPath.hidden = true;
+    if (activationPath) activationPath.hidden = false;
+
+    const resultTitle = document.getElementById("resultTitle");
+    const resultText = document.getElementById("resultText");
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    const activationWhatsappBtn = document.getElementById(
+      "activationWhatsappBtn",
+    );
+
+    if (checkoutBtn) {
+      checkoutBtn.href = CONFIG.checkoutUrl;
+    }
+
+    if (activationWhatsappBtn) {
+      activationWhatsappBtn.href = createWhatsAppLink(lead);
+    }
+
+    if (resultTitle) {
+      resultTitle.textContent =
+        score >= 5
+          ? "Seu perfil mostra boa aderência inicial ao modelo."
+          : score >= 3
+            ? "Seu perfil tem pontos de aderência que vale explorar."
+            : "Vale conhecer o modelo com calma antes de decidir.";
+    }
+
+    if (resultText) {
+      resultText.textContent = `${lead.nome}, sua resposta indica foco em “${answers.objetivo || "avaliar a oportunidade"}”. O próximo passo é conhecer as regras atuais, contrato, portfólio e forma de atuação.`;
+    }
+
+    if (checkoutBtn) {
+      checkoutBtn.href = CONFIG.checkoutUrl;
+    }
   }
 
-  if (resultText) {
-    resultText.textContent = `${lead.nome}, sua resposta indica foco em “${answers.objetivo || "avaliar a oportunidade"}”. O próximo passo é conhecer as regras atuais, contrato, portfólio e forma de atuação.`;
-  }
+  /*
+   * EXIBE RESULTADO
+   */
 
-  if (checkoutBtn) checkoutBtn.href = CONFIG.checkoutUrl;
   step = 5;
+
   renderQuiz();
 }
 
@@ -356,3 +493,76 @@ videos.forEach((video) => {
     });
   });
 });
+
+// -------------------------
+// Vídeo BP / autoplay ao entrar na tela
+// -------------------------
+
+const bpYoutubeIframe = document.getElementById("bpYoutubeVideo");
+const bpVideoSection = bpYoutubeIframe?.closest(".partnership-video");
+
+let bpYoutubePlayer = null;
+let bpYoutubeReady = false;
+let bpVideoVisible = false;
+
+/**
+ * Executa a reprodução conforme a posição atual da seção.
+ * O vídeo inicia mudo porque os navegadores bloqueiam
+ * autoplay automático com áudio.
+ */
+function updateBpYoutubePlayback() {
+  if (!bpYoutubeReady || !bpYoutubePlayer) return;
+
+  if (bpVideoVisible) {
+    bpYoutubePlayer.mute();
+    bpYoutubePlayer.playVideo();
+  } else {
+    bpYoutubePlayer.pauseVideo();
+  }
+}
+
+if (bpYoutubeIframe && bpVideoSection) {
+  // Carrega a API oficial do YouTube
+  const youtubeApiScript = document.createElement("script");
+
+  youtubeApiScript.src = "https://www.youtube.com/iframe_api";
+  youtubeApiScript.async = true;
+
+  document.head.appendChild(youtubeApiScript);
+
+  // Observa quando o vídeo entra na área visível
+  const bpVideoObserver = new IntersectionObserver(
+    (entries) => {
+      const entry = entries[0];
+
+      /*
+       * Só inicia quando pelo menos 55% do vídeo
+       * estiver realmente aparecendo na tela.
+       */
+      bpVideoVisible = entry.isIntersecting && entry.intersectionRatio >= 0.55;
+
+      updateBpYoutubePlayback();
+    },
+    {
+      threshold: [0, 0.25, 0.55, 0.75, 1],
+    },
+  );
+
+  bpVideoObserver.observe(bpVideoSection);
+
+  // Chamado automaticamente pela API do YouTube
+  window.onYouTubeIframeAPIReady = function () {
+    bpYoutubePlayer = new YT.Player("bpYoutubeVideo", {
+      events: {
+        onReady: function () {
+          bpYoutubeReady = true;
+
+          // Prepara o vídeo mudo para autoplay
+          bpYoutubePlayer.unMute();
+
+          updateBpYoutubePlayback();
+        },
+      },
+    });
+  };
+}

@@ -935,39 +935,59 @@
       <section class="partnership-section dark-band">
         <div class="wrap partnership-grid">
           <div>
-            <span class="section-kicker">FORÇA DE MARCA</span>
+            <span class="section-kicker"> FORÇA DE MARCA </span>
+
             <h2>
               Parcerias que ajudam a colocar a iGreen
-              <span class="accent">em outro patamar de visibilidade.</span>
+              <span class="accent"> em outro patamar de visibilidade. </span>
             </h2>
+
             <p>
               A própria iGreen destaca uma parceria estratégica envolvendo
               Gusttavo Lima, BP Seguradora e iGreen, além da expansão do
               ecossistema para novas frentes de serviços.
             </p>
+
             <div
               class="partner-line"
               aria-label="Parceria estratégica divulgada pela iGreen"
             >
-              <strong>Gusttavo Lima</strong><span>+</span
-              ><strong>BP Seguradora</strong><span>+</span
-              ><strong>iGreen</strong>
+              <strong>Gusttavo Lima</strong>
+              <span>+</span>
+
+              <strong>BP Seguradora</strong>
+              <span>+</span>
+
+              <strong>iGreen</strong>
             </div>
-            <small class="source-note source-note-inline"
-              >Referência institucional: site oficial iGreen, consultado em
-              agosto de 2026.</small
-            >
+
+            <small class="source-note source-note-inline">
+              Referência institucional: site oficial iGreen, consultado em
+              agosto de 2026.
+            </small>
           </div>
-          <div class="market-card">
-            <span class="section-kicker">ATUAÇÃO NACIONAL E INTERNACIONAL</span>
-            <strong>Brasil → Estados Unidos</strong>
-            <p>
-              A expansão da iGreen Mobile para os Estados Unidos reforça a
-              estratégia de crescimento e posicionamento internacional da marca.
-            </p>
-            <div class="market-points">
-              <span>21+ estados</span><span>1.000+ usinas</span
-              ><span>30+ distribuidoras</span>
+
+          <div class="partnership-video">
+            <div class="partnership-video">
+              <iframe
+                id="bpYoutubeVideo"
+                src="https://www.youtube.com/embed/DKm97JVMzNs?enablejsapi=1&playsinline=1&rel=0"
+                title="Vídeo Oficial BP iGreen SP"
+                frameborder="0"
+                loading="lazy"
+                allow="
+                  accelerometer;
+                  autoplay;
+                  clipboard-write;
+                  encrypted-media;
+                  gyroscope;
+                  picture-in-picture;
+                  web-share;
+                "
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+              >
+              </iframe>
             </div>
           </div>
         </div>
@@ -1232,27 +1252,127 @@
             </div>
 
             <div class="q" data-step="5">
-              <div class="result-box">
-                <div class="kicker">PRÉ-AVALIAÇÃO CONCLUÍDA</div>
-                <strong id="resultTitle"
-                  >Seu perfil tem pontos de aderência ao modelo.</strong
-                >
-                <p id="resultText"></p>
+              <!-- =========================================
+       CAMINHO 1 — QUER CONHECER ANTES DE DECIDIR
+       ========================================= -->
+              <div id="whatsappPath" hidden>
+                <div class="result-box">
+                  <div class="kicker">PRÉ-AVALIAÇÃO CONCLUÍDA</div>
+
+                  <strong>
+                    Seu próximo passo é conversar com um especialista.
+                  </strong>
+
+                  <p id="whatsappResultText"></p>
+                </div>
+
+                <div class="whatsapp-result-card">
+                  <span class="section-kicker">
+                    ATENDIMENTO PERSONALIZADO
+                  </span>
+
+                  <h3>Conheça melhor a oportunidade antes de decidir.</h3>
+
+                  <p>
+                    Tire suas dúvidas sobre funcionamento, licença,
+                    comissionamento, treinamento e estrutura diretamente pelo
+                    WhatsApp.
+                  </p>
+
+                  <div class="whatsapp-benefits">
+                    <span>✓ Tire suas dúvidas</span>
+
+                    <span>✓ Entenda o modelo</span>
+
+                    <span>✓ Conheça os próximos passos</span>
+                  </div>
+
+                  <a
+                    id="whatsappBtn"
+                    class="btn btn-whatsapp"
+                    href="#"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    FALAR PELO WHATSAPP →
+                  </a>
+
+                  <small>
+                    Seu atendimento já receberá as informações preenchidas nesta
+                    pré-avaliação.
+                  </small>
+                </div>
               </div>
-              <h3>Próximo passo: conhecer a ativação e as regras atuais.</h3>
-              <p class="result-explain">
-                A decisão deve ser feita depois de conhecer contrato, regras de
-                bonificação, renovação da licença e política de uso da marca.
-                Não há garantia de faturamento ou resultado.
-              </p>
-              <a
-                id="checkoutBtn"
-                class="btn btn-primary"
-                href="https://expansao.igreenenergy.com.br/?id=29284&checkout=true"
-                target="_blank"
-                rel="noopener"
-                >VER ATIVAÇÃO DA LICENÇA →</a
-              >
+
+              <!-- =========================================
+              CAMINHO 2 — QUER COMEÇAR / ATIVAR
+              ========================================= -->
+              <div id="activationPath">
+                <div class="result-box">
+                  <div class="kicker">PRÉ-AVALIAÇÃO CONCLUÍDA</div>
+
+                  <strong id="resultTitle">
+                    Seu perfil tem pontos de aderência ao modelo.
+                  </strong>
+
+                  <p id="resultText"></p>
+                </div>
+
+                <div class="final-decision-card">
+                  <span class="section-kicker">
+                    ESCOLHA SEU PRÓXIMO PASSO
+                  </span>
+
+                  <h3>
+                    Você pode começar agora ou conversar com nosso time antes de
+                    ativar.
+                  </h3>
+
+                  <p>
+                    Sua pré-avaliação já foi registrada. Escolha como prefere
+                    continuar.
+                  </p>
+
+                  <div class="final-actions">
+                    <a
+                      id="checkoutBtn"
+                      class="btn btn-primary"
+                      href="https://expansao.igreenenergy.com.br/?id=29284&checkout=true"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      ATIVAR MINHA LICENÇA →
+                    </a>
+
+                    <a
+                      id="activationWhatsappBtn"
+                      class="btn btn-whatsapp-outline"
+                      href="#"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      <span class="whatsapp-icon"></span>
+                      FALAR COM O TIME
+                    </a>
+                  </div>
+
+                  <div class="decision-help">
+                    <div>
+                      <strong>Já decidiu começar?</strong>
+                      <span>
+                        Siga diretamente para a ativação da licença.
+                      </span>
+                    </div>
+
+                    <div>
+                      <strong>Ainda tem alguma dúvida?</strong>
+                      <span>
+                        Converse com nosso time antes de tomar sua decisão.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="quiz-actions">

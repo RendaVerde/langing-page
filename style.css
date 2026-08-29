@@ -462,9 +462,7 @@ h2 {
 
 .authority-grid {
   display: grid;
-  grid-template-columns:
-    minmax(0, 0.9fr)
-    minmax(0, 1.1fr);
+  grid-template-columns: 1fr 620px;
   gap: 48px;
   align-items: center;
 }
@@ -882,9 +880,11 @@ h2 {
 
 .partnership-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 30px;
-  align-items: stretch;
+  grid-template-columns:
+    minmax(0, 0.95fr)
+    minmax(0, 1.05fr);
+  gap: 42px;
+  align-items: center;
 }
 .partnership-grid p {
   color: var(--muted);
@@ -908,6 +908,28 @@ h2 {
 .partner-line span {
   color: var(--green2);
   font-weight: 900;
+}
+.partnership-video {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  overflow: hidden;
+  background: #050706;
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.32),
+    0 0 40px rgba(0, 245, 114, 0.04);
+}
+
+.partnership-video iframe {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 .market-card {
   border: 1px solid var(--line);
@@ -1287,6 +1309,176 @@ footer {
   cursor: pointer;
 }
 
+/* =====================================================
+   RESULTADO / WHATSAPP
+   ===================================================== */
+.whatsapp-result-card {
+  position: relative;
+  padding: 32px;
+  margin-top: 18px;
+  border: 1px solid rgba(0, 245, 114, 0.28);
+  border-radius: 26px;
+  background:
+    radial-gradient(
+      circle at 85% 10%,
+      rgba(0, 245, 114, 0.1),
+      transparent 16rem
+    ),
+    #0d1210;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+}
+
+.whatsapp-result-card h3 {
+  max-width: 700px;
+  margin: 5px 0 14px;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.whatsapp-result-card > p {
+  max-width: 690px;
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.whatsapp-benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.whatsapp-benefits span {
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: #d9e5dc;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.btn-whatsapp {
+  background: linear-gradient(90deg, #00d95f, #00f572);
+  color: #041108;
+  box-shadow: 0 10px 36px rgba(0, 245, 114, 0.2);
+}
+
+.btn-whatsapp:hover {
+  box-shadow: 0 12px 42px rgba(0, 245, 114, 0.3);
+}
+
+.whatsapp-result-card small {
+  display: block;
+  margin-top: 13px;
+  color: #718077;
+  font-size: 11px;
+}
+/* =====================================================
+   ESCOLHA FINAL - ATIVAÇÃO OU WHATSAPP
+   ===================================================== */
+
+.final-decision-card {
+  margin-top: 20px;
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    radial-gradient(
+      circle at 85% 15%,
+      rgba(0, 245, 114, 0.08),
+      transparent 20rem
+    ),
+    #0d1110;
+}
+
+.final-decision-card h3 {
+  margin: 4px 0 12px;
+  max-width: 780px;
+  font-size: clamp(27px, 3.5vw, 40px);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.final-decision-card > p {
+  color: var(--muted);
+  max-width: 720px;
+  margin: 0 0 26px;
+}
+
+.final-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 760px;
+}
+
+.final-actions .btn {
+  width: 100%;
+}
+
+/* WhatsApp como segundo CTA */
+.btn-whatsapp-outline {
+  color: #eaffee;
+  background: rgba(0, 245, 114, 0.055);
+  border: 1px solid rgba(0, 245, 114, 0.38);
+  box-shadow: inset 0 0 18px rgba(0, 245, 114, 0.025);
+  transition: 0.2s ease;
+}
+
+.btn-whatsapp-outline:hover {
+  color: #041108;
+  background: linear-gradient(90deg, var(--green), var(--green2));
+  border-color: transparent;
+  box-shadow: 0 10px 32px rgba(0, 245, 114, 0.2);
+}
+
+.whatsapp-icon {
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+  border-radius: 50%;
+  background: var(--green2);
+  box-shadow: 0 0 8px rgba(0, 245, 114, 0.8);
+}
+
+.btn-whatsapp-outline:hover .whatsapp-icon {
+  background: #041108;
+  box-shadow: none;
+}
+
+/* Informação abaixo dos botões */
+
+.decision-help {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+  max-width: 760px;
+}
+
+.decision-help > div {
+  padding: 15px 17px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.decision-help strong {
+  display: block;
+  font-size: 14px;
+  color: #fff;
+}
+
+.decision-help span {
+  display: block;
+  margin-top: 3px;
+  color: #7f8b82;
+  font-size: 12px;
+}
+
 @media (max-width: 1050px) {
   .numbers-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -1302,6 +1494,15 @@ footer {
   }
   .recognition-journey {
     grid-template-columns: 1fr 1fr;
+  }
+  .partnership-grid {
+    grid-template-columns: 1fr;
+  }
+  .partnership-video {
+    width: 100%;
+    max-width: 900px;
+
+    justify-self: center;
   }
 }
 
@@ -1499,8 +1700,8 @@ footer {
   .recognition-journey {
     grid-template-columns: 1fr;
   }
-  .market-card strong {
-    font-size: 31px;
+  .partnership-video {
+    border-radius: 22px;
   }
   .quiz {
     padding: 22px;
@@ -1534,6 +1735,26 @@ footer {
   .lightbox-close {
     top: 12px;
     right: 12px;
+  }
+  .whatsapp-result-card {
+    padding: 22px;
+    border-radius: 22px;
+  }
+  .whatsapp-result-card h3 {
+    font-size: 29px;
+  }
+  .btn-whatsapp {
+    width: 100%;
+  }
+  .final-decision-card {
+    padding: 22px;
+    border-radius: 22px;
+  }
+  .final-actions {
+    grid-template-columns: 1fr;
+  }
+  .decision-help {
+    grid-template-columns: 1fr;
   }
 }
 
