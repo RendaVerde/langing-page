@@ -1,12 +1,13 @@
 const CONFIG = {
-  // Para integrar CRM/n8n/Google Sheets, informe aqui seu webhook HTTPS.
   webhookUrl: "",
   checkoutUrl: "https://expansao.igreenenergy.com.br/?id=29284&checkout=true",
 };
 
+// -------------------------
+// Quiz / qualificação
+// -------------------------
 const answers = {};
 let step = 1;
-const maxVisibleStep = 5;
 const qs = [...document.querySelectorAll(".q")];
 const bar = document.getElementById("bar");
 const label = document.getElementById("stepLabel");
@@ -15,19 +16,22 @@ const nextBtn = document.getElementById("nextBtn");
 const toast = document.getElementById("toast");
 
 function showToast(msg) {
+  if (!toast) return;
   toast.textContent = msg;
   toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 1800);
+  window.setTimeout(() => toast.classList.remove("show"), 1800);
 }
 
-function render() {
+function renderQuiz() {
   qs.forEach((q) =>
     q.classList.toggle("active", Number(q.dataset.step) === step),
   );
-  bar.style.width = Math.min(100, (step / 4) * 100) + "%";
-  label.textContent = step <= 4 ? `PERGUNTA ${step} DE 4` : "RESULTADO";
-  backBtn.style.visibility = step > 1 && step < 5 ? "visible" : "hidden";
-  nextBtn.style.display = step === 4 ? "inline-flex" : "none";
+  if (bar) bar.style.width = Math.min(100, (step / 4) * 100) + "%";
+  if (label)
+    label.textContent = step <= 4 ? `PERGUNTA ${step} DE 4` : "RESULTADO";
+  if (backBtn)
+    backBtn.style.visibility = step > 1 && step < 5 ? "visible" : "hidden";
+  if (nextBtn) nextBtn.style.display = step === 4 ? "inline-flex" : "none";
 }
 
 document.querySelectorAll(".opt").forEach((btn) => {
@@ -38,22 +42,24 @@ document.querySelectorAll(".opt").forEach((btn) => {
       .querySelectorAll(".opt")
       .forEach((x) => x.classList.remove("selected"));
     btn.classList.add("selected");
-    setTimeout(() => {
+    window.setTimeout(() => {
       step++;
-      render();
+      renderQuiz();
     }, 180);
   });
 });
 
-backBtn.addEventListener("click", () => {
-  if (step > 1) {
-    step--;
-    render();
-  }
-});
+if (backBtn) {
+  backBtn.addEventListener("click", () => {
+    if (step > 1) {
+      step--;
+      renderQuiz();
+    }
+  });
+}
 
 function scoreProfile() {
-  let s = 0;
+  let score = 0;
   if (
     [
       "Nova atividade profissional",
@@ -61,7 +67,7 @@ function scoreProfile() {
       "Desenvolver equipe",
     ].includes(answers.objetivo)
   )
-    s += 2;
+    score += 2;
   if (
     [
       "5 a 15h por semana",
@@ -69,7 +75,7 @@ function scoreProfile() {
       "Dedicação principal",
     ].includes(answers.tempo)
   )
-    s += 2;
+    score += 2;
   if (
     [
       "Já vendo/empreendo",
@@ -77,23 +83,32 @@ function scoreProfile() {
       "Quero aprender vendas",
     ].includes(answers.perfil)
   )
-    s += 2;
-  return s;
+    score += 2;
+  return score;
 }
 
 async function submitLead() {
+  const nome = document.getElementById("nome");
+  const whats = document.getElementById("whats");
+  const cidade = document.getElementById("cidade");
+  const email = document.getElementById("email");
+  const momento = document.getElementById("momento");
+  const params = new URLSearchParams(window.location.search);
+
   const lead = {
     ...answers,
-    nome: document.getElementById("nome").value.trim(),
-    whatsapp: document.getElementById("whats").value.trim(),
-    cidade: document.getElementById("cidade").value.trim(),
-    email: document.getElementById("email").value.trim(),
-    momento: document.getElementById("momento").value,
-    page: location.href,
-    utm_source: new URLSearchParams(location.search).get("utm_source") || "",
-    utm_campaign:
-      new URLSearchParams(location.search).get("utm_campaign") || "",
-    gclid: new URLSearchParams(location.search).get("gclid") || "",
+    nome: nome?.value.trim() || "",
+    whatsapp: whats?.value.trim() || "",
+    cidade: cidade?.value.trim() || "",
+    email: email?.value.trim() || "",
+    momento: momento?.value || "",
+    page: window.location.href,
+    utm_source: params.get("utm_source") || "",
+    utm_medium: params.get("utm_medium") || "",
+    utm_campaign: params.get("utm_campaign") || "",
+    utm_content: params.get("utm_content") || "",
+    gclid: params.get("gclid") || "",
+    fbclid: params.get("fbclid") || "",
     created_at: new Date().toISOString(),
   };
 
@@ -111,24 +126,233 @@ async function submitLead() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(lead),
       });
-    } catch (e) {}
+    } catch (error) {
+      console.warn("Webhook indisponível:", error);
+    }
   }
 
   const score = scoreProfile();
-  document.getElementById("resultTitle").textContent =
-    score >= 5
-      ? "Seu perfil mostra boa aderência inicial ao modelo."
-      : score >= 3
-        ? "Seu perfil tem pontos de aderência que vale explorar."
-        : "Vale conhecer o modelo com calma antes de decidir.";
+  const resultTitle = document.getElementById("resultTitle");
+  const resultText = document.getElementById("resultText");
+  const checkoutBtn = document.getElementById("checkoutBtn");
 
-  document.getElementById("resultText").textContent =
-    `${lead.nome}, sua resposta indica foco em “${answers.objetivo || "avaliar a oportunidade"}”. O próximo passo é conhecer as regras atuais, contrato, portfólio e forma de atuação.`;
+  if (resultTitle) {
+    resultTitle.textContent =
+      score >= 5
+        ? "Seu perfil mostra boa aderência inicial ao modelo."
+        : score >= 3
+          ? "Seu perfil tem pontos de aderência que vale explorar."
+          : "Vale conhecer o modelo com calma antes de decidir.";
+  }
 
-  document.getElementById("checkoutBtn").href = CONFIG.checkoutUrl;
+  if (resultText) {
+    resultText.textContent = `${lead.nome}, sua resposta indica foco em “${answers.objetivo || "avaliar a oportunidade"}”. O próximo passo é conhecer as regras atuais, contrato, portfólio e forma de atuação.`;
+  }
+
+  if (checkoutBtn) checkoutBtn.href = CONFIG.checkoutUrl;
   step = 5;
-  render();
+  renderQuiz();
 }
 
-nextBtn.addEventListener("click", submitLead);
-render();
+if (nextBtn) nextBtn.addEventListener("click", submitLead);
+renderQuiz();
+
+// -------------------------
+// Prova social / carrossel + filtros
+// -------------------------
+const proofSlider = document.getElementById("proofSlider");
+const proofSlides = [...document.querySelectorAll(".proof-slide")];
+const proofPrev = document.getElementById("proofPrev");
+const proofNext = document.getElementById("proofNext");
+const proofCategory = document.getElementById("proofCategory");
+const proofTitle = document.getElementById("proofTitle");
+const proofLocation = document.getElementById("proofLocation");
+const proofMetric = document.getElementById("proofMetric");
+const proofCurrent = document.getElementById("proofCurrent");
+const proofTotal = document.getElementById("proofTotal");
+const proofProgressBar = document.getElementById("proofProgressBar");
+const proofFilterButtons = [...document.querySelectorAll(".proof-filter")];
+const prefersReducedMotion = window.matchMedia(
+  "(prefers-reduced-motion: reduce)",
+).matches;
+
+let activeProofFilter = "Todos";
+let visibleProofSlides = [...proofSlides];
+let proofIndex = 0;
+let proofTimer = null;
+let proofProgressTimer = null;
+let proofProgress = 0;
+const proofIntervalMs = 5200;
+
+function pad2(value) {
+  return String(value).padStart(2, "0");
+}
+
+function rebuildVisibleProofs() {
+  visibleProofSlides = proofSlides.filter(
+    (slide) =>
+      activeProofFilter === "Todos" ||
+      slide.dataset.category === activeProofFilter,
+  );
+  proofSlides.forEach((slide) =>
+    slide.classList.toggle(
+      "is-filtered-out",
+      !visibleProofSlides.includes(slide),
+    ),
+  );
+  proofIndex = 0;
+  updateProof(0);
+  startProofAutoplay();
+}
+
+function updateProof(index, resetProgress = true) {
+  if (!visibleProofSlides.length) return;
+  proofIndex = (index + visibleProofSlides.length) % visibleProofSlides.length;
+  proofSlides.forEach((slide) => slide.classList.remove("is-active"));
+  const active = visibleProofSlides[proofIndex];
+  active.classList.add("is-active");
+  if (proofCategory)
+    proofCategory.textContent = active.dataset.category || "Resultado";
+  if (proofTitle) proofTitle.textContent = active.dataset.title || "Destaque";
+  if (proofLocation) proofLocation.textContent = active.dataset.location || "";
+  if (proofMetric)
+    proofMetric.textContent = active.dataset.metric || "Resultado em destaque";
+  if (proofCurrent) proofCurrent.textContent = pad2(proofIndex + 1);
+  if (proofTotal) proofTotal.textContent = pad2(visibleProofSlides.length);
+  if (resetProgress) {
+    proofProgress = 0;
+    if (proofProgressBar) proofProgressBar.style.width = "0%";
+  }
+}
+
+function stopProofAutoplay() {
+  if (proofTimer) window.clearInterval(proofTimer);
+  if (proofProgressTimer) window.clearInterval(proofProgressTimer);
+  proofTimer = null;
+  proofProgressTimer = null;
+}
+
+function startProofAutoplay() {
+  if (prefersReducedMotion || visibleProofSlides.length < 2) return;
+  stopProofAutoplay();
+  proofProgress = 0;
+  proofTimer = window.setInterval(
+    () => updateProof(proofIndex + 1),
+    proofIntervalMs,
+  );
+  proofProgressTimer = window.setInterval(() => {
+    proofProgress += 100 / (proofIntervalMs / 100);
+    if (proofProgress >= 100) proofProgress = 0;
+    if (proofProgressBar) proofProgressBar.style.width = `${proofProgress}%`;
+  }, 100);
+}
+
+proofFilterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    activeProofFilter = button.dataset.filter || "Todos";
+    proofFilterButtons.forEach((item) =>
+      item.classList.toggle("is-active", item === button),
+    );
+    rebuildVisibleProofs();
+  });
+});
+
+if (proofPrev)
+  proofPrev.addEventListener("click", () => {
+    updateProof(proofIndex - 1);
+    startProofAutoplay();
+  });
+if (proofNext)
+  proofNext.addEventListener("click", () => {
+    updateProof(proofIndex + 1);
+    startProofAutoplay();
+  });
+if (proofSlider) {
+  proofSlider.addEventListener("mouseenter", stopProofAutoplay);
+  proofSlider.addEventListener("mouseleave", startProofAutoplay);
+  proofSlider.addEventListener("focusin", stopProofAutoplay);
+  proofSlider.addEventListener("focusout", startProofAutoplay);
+}
+
+// Pausa o autoplay quando o carrossel sai da área visível.
+if ("IntersectionObserver" in window && proofSlider) {
+  const proofObserver = new IntersectionObserver(
+    (entries) => {
+      const [entry] = entries;
+      if (entry.isIntersecting) startProofAutoplay();
+      else stopProofAutoplay();
+    },
+    { threshold: 0.2 },
+  );
+  proofObserver.observe(proofSlider);
+}
+
+updateProof(0);
+startProofAutoplay();
+
+// -------------------------
+// Lightbox das provas
+// -------------------------
+const lightbox = document.getElementById("lightbox");
+const lightboxImage = document.getElementById("lightboxImage");
+const lightboxClose = document.getElementById("lightboxClose");
+let lastLightboxTrigger = null;
+
+function openLightbox(img, trigger) {
+  if (!lightbox || !lightboxImage) return;
+  lastLightboxTrigger = trigger || null;
+  lightboxImage.src = img.src;
+  lightboxImage.alt = img.alt;
+  lightbox.classList.add("is-open");
+  lightbox.setAttribute("aria-hidden", "false");
+  document.body.classList.add("lightbox-open");
+  lightboxClose?.focus();
+}
+
+function closeLightbox() {
+  if (!lightbox) return;
+  lightbox.classList.remove("is-open");
+  lightbox.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("lightbox-open");
+  lastLightboxTrigger?.focus();
+}
+
+document.querySelectorAll(".proof-image-button").forEach((button) => {
+  button.addEventListener("click", () => {
+    const img = button.querySelector("img");
+    if (img) openLightbox(img, button);
+  });
+});
+
+lightboxClose?.addEventListener("click", closeLightbox);
+lightbox?.addEventListener("click", (event) => {
+  if (event.target === lightbox) closeLightbox();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && lightbox?.classList.contains("is-open"))
+    closeLightbox();
+  if (
+    !lightbox?.classList.contains("is-open") &&
+    document.activeElement?.closest?.("#proofSlider")
+  ) {
+    if (event.key === "ArrowRight") {
+      updateProof(proofIndex + 1);
+      startProofAutoplay();
+    }
+    if (event.key === "ArrowLeft") {
+      updateProof(proofIndex - 1);
+      startProofAutoplay();
+    }
+  }
+});
+
+// Evita múltiplos vídeos tocando ao mesmo tempo
+const videos = [...document.querySelectorAll("video")];
+videos.forEach((video) => {
+  video.addEventListener("play", () => {
+    videos.forEach((other) => {
+      if (other !== video && !other.paused) other.pause();
+    });
+  });
+});

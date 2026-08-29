@@ -4,22 +4,21 @@
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="width=device-width,initial-scale=1,viewport-fit=cover"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <title>iGreen Energy | Seja um Licenciado</title>
     <meta
       name="description"
-      content="Conheça a atuação como Licenciado iGreen Energy e avalie se o modelo combina com o seu perfil."
+      content="Conheça a oportunidade de atuar como Licenciado iGreen em energia, telecom, seguros e soluções recorrentes."
     />
     <meta name="theme-color" content="#070909" />
+    <link rel="stylesheet" href="./style.css" />
     <link rel="shortcut icon" href="./img/favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="style.css" />
-    <script src="./script.js" defer></script>
   </head>
   <body>
-    <nav class="nav">
+    <nav class="nav" aria-label="Navegação principal">
       <div class="wrap nav-inner">
-        <a class="brand" href="#top" aria-label="iGreen Energy">
+        <a class="brand" href="#top" aria-label="iGreen Energy - início">
           <img
             src="./img/igreen-logo-BvR4VanC.png"
             alt="iGreen Energy"
@@ -32,8 +31,9 @@
 
     <main id="top">
       <section class="hero">
+        <div class="hero-grid-bg" aria-hidden="true"></div>
         <div class="wrap hero-grid">
-          <div>
+          <div class="hero-copy">
             <span class="eyebrow"
               ><i></i> Entre em mercados essenciais e construa recorrência</span
             >
@@ -42,9 +42,9 @@
               <span class="accent">todo mundo já consome.</span>
             </h1>
             <p class="lead">
-              Construa uma atuação comercial em energia, telecom e soluções
-              digitais com estrutura, treinamento e suporte — sem estoque e sem
-              precisar começar do zero.
+              Construa uma atuação comercial em energia, telecom, seguros e
+              soluções digitais com estrutura, treinamento e suporte — sem
+              estoque e sem precisar começar do zero.
             </p>
             <div class="actions">
               <a class="btn btn-primary" href="#avaliacao"
@@ -60,7 +60,7 @@
             </div>
           </div>
 
-          <aside class="hero-card">
+          <aside class="hero-card" aria-label="Visão geral do ecossistema">
             <div class="kicker">Uma operação. Várias frentes.</div>
             <div class="big-stat">360°</div>
             <div class="stat-desc">
@@ -75,13 +75,40 @@
                 <span class="dot">✓</span> Mercado Livre de Energia
               </div>
               <div class="mini-row">
-                <span class="dot">✓</span> Telecom e benefícios
+                <span class="dot">✓</span> Telecom e seguros
               </div>
               <div class="mini-row">
                 <span class="dot">✓</span> Conexão Expansão
               </div>
             </div>
           </aside>
+        </div>
+      </section>
+
+      <section class="numbers-strip" aria-label="Números institucionais">
+        <div class="wrap numbers-grid">
+          <article class="number-card">
+            <strong>800 mil+</strong><span>clientes conectados</span>
+          </article>
+          <article class="number-card">
+            <strong>21+</strong><span>estados atendidos</span>
+          </article>
+          <article class="number-card">
+            <strong>1.000+</strong><span>usinas solares</span>
+          </article>
+          <article class="number-card">
+            <strong>30+</strong><span>distribuidoras integradas</span>
+          </article>
+          <article class="number-card">
+            <strong>3.000 m²</strong><span>de sede própria</span>
+          </article>
+          <article class="number-card">
+            <strong>500+</strong><span>colaboradores</span>
+          </article>
+        </div>
+        <div class="wrap source-note">
+          Dados institucionais publicados pela iGreen e consultados em agosto de
+          2026.
         </div>
       </section>
 
@@ -185,7 +212,53 @@
         </div>
       </section>
 
-      <section class="dark-band">
+      <section class="authority-section dark-band">
+        <div class="wrap authority-grid">
+          <div class="authority-copy">
+            <span class="section-kicker"
+              >MARCA, TRAJETÓRIA E RECONHECIMENTO</span
+            >
+            <h2>
+              Uma oportunidade fica mais forte quando existe
+              <span class="accent">estrutura por trás.</span>
+            </h2>
+            <p>
+              A iGreen nasceu em 2021, ultrapassou 100 mil clientes em 2024,
+              passou de 450 mil em 2025 e informa ter superado 800 mil clientes
+              em 2026. A marca também ampliou o ecossistema para telecom,
+              seguros e expansão internacional.
+            </p>
+            <div class="recognition-grid">
+              <div class="recognition">
+                <b>RA1000</b><span>reconhecimento em atendimento</span>
+              </div>
+              <div class="recognition">
+                <b>GPTW</b><span>certificação de ambiente de trabalho</span>
+              </div>
+              <div class="recognition">
+                <b>2025</b><span>indicação ao Prêmio Reclame Aqui</span>
+              </div>
+            </div>
+          </div>
+          <figure class="forbes-card">
+            <img
+              src="./img/institucional/forbes-under-30.jpeg"
+              alt="Capa de publicação Forbes Under 30 relacionada à liderança iGreen"
+              loading="lazy"
+            />
+            <figcaption>
+              <span class="section-kicker">LIDERANÇA EM DESTAQUE</span>
+              <strong>Reconhecimento que amplia a percepção de marca.</strong>
+              <small
+                >A própria iGreen destaca em sua trajetória o reconhecimento da
+                CEO Amanda Durante pela Forbes.</small
+              >
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section>
         <div class="wrap">
           <div class="section-head">
             <h2>
@@ -224,11 +297,8 @@
               <p>Conectividade como nova frente de relacionamento e oferta.</p>
             </div>
             <div class="eco">
-              <b>iGreen Club</b>
-              <p>
-                Benefícios que reforçam relacionamento e percepção de valor do
-                ecossistema.
-              </p>
+              <b>Seguros</b>
+              <p>Proteção veicular dentro do ecossistema de multisserviços.</p>
             </div>
             <div class="eco">
               <b>Expansão</b>
@@ -241,7 +311,514 @@
         </div>
       </section>
 
-      <section>
+      <section id="prova-social" class="social-section dark-band">
+        <div class="wrap">
+          <div class="section-head social-head">
+            <div>
+              <span class="section-kicker">PROVA SOCIAL</span>
+              <h2>
+                Resultados que colocam
+                <span class="accent">rostos na oportunidade.</span>
+              </h2>
+            </div>
+            <p>
+              Destaques reais presentes nos materiais enviados, distribuídos
+              entre Expansão, Green, Livre, Telecom, Seguros, Solar e Placas.
+              Use os filtros para navegar pelas diferentes frentes.
+            </p>
+          </div>
+
+          <div
+            class="proof-filters"
+            id="proofFilters"
+            aria-label="Filtrar provas por conexão"
+          >
+            <button
+              class="proof-filter is-active"
+              type="button"
+              data-filter="Todos"
+            >
+              Todos
+            </button>
+            <button class="proof-filter" type="button" data-filter="Expansão">
+              Expansão
+            </button>
+            <button class="proof-filter" type="button" data-filter="Green">
+              Green
+            </button>
+            <button class="proof-filter" type="button" data-filter="Livre">
+              Livre
+            </button>
+            <button class="proof-filter" type="button" data-filter="Telecom">
+              Telecom
+            </button>
+            <button class="proof-filter" type="button" data-filter="Seguros">
+              Seguros
+            </button>
+            <button class="proof-filter" type="button" data-filter="Solar">
+              Solar
+            </button>
+            <button class="proof-filter" type="button" data-filter="Placas">
+              Placas
+            </button>
+          </div>
+
+          <div
+            class="proof-shell"
+            id="proofSlider"
+            aria-roledescription="carrossel"
+            aria-label="Resultados de licenciados e clientes"
+          >
+            <div class="proof-glow" aria-hidden="true"></div>
+            <div class="proof-stage">
+              <article
+                class="proof-slide is-active"
+                data-category="Expansão"
+                data-title="Welicon Moreira"
+                data-location="Colatina · ES"
+                data-metric="50 licenciados conectados"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Welicon Moreira"
+                >
+                  <img
+                    src="./img/provas/expansao-welicon-50.jpg"
+                    alt="Destaque Conexão Expansão - Welicon Moreira"
+                    loading="eager"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Expansão"
+                data-title="Wesley Renato"
+                data-location="Orlando · USA"
+                data-metric="34 licenciados conectados"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Wesley Renato"
+                >
+                  <img
+                    src="./img/provas/expansao-wesley-34.jpg"
+                    alt="Destaque Conexão Expansão - Wesley Renato"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Expansão"
+                data-title="Diego e Klein Canto"
+                data-location="Criciúma · SC"
+                data-metric="11 licenciados conectados"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Diego e Klein Canto"
+                >
+                  <img
+                    src="./img/provas/expansao-diego-klein-11.jpg"
+                    alt="Destaque Conexão Expansão - Diego e Klein Canto"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Green"
+                data-title="Simone de Fátima"
+                data-location="Guaíba · RS"
+                data-metric="434 associados"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Simone de Fátima"
+                >
+                  <img
+                    src="./img/provas/green-simone.jpg"
+                    alt="Destaque Conexão Green - Simone de Fátima"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Green"
+                data-title="Alex Aparecido"
+                data-location="Maringá · PR"
+                data-metric="389 associados"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Alex Aparecido"
+                >
+                  <img
+                    src="./img/provas/green-alex.jpg"
+                    alt="Destaque Conexão Green - Alex Aparecido"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Green"
+                data-title="Alexsander Rigotti"
+                data-location="Guaíba · RS"
+                data-metric="224 associados"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Alexsander Rigotti"
+                >
+                  <img
+                    src="./img/provas/green-alexsander.jpg"
+                    alt="Destaque Conexão Green - Alexsander Rigotti"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Livre"
+                data-title="Clayton Guimarães"
+                data-location="Rio Verde · GO"
+                data-metric="R$ 33.806,24 de recorrência total"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Clayton Guimarães"
+                >
+                  <img
+                    src="./img/provas/livre-clayton.jpg"
+                    alt="Destaque Conexão Livre - Clayton Guimarães"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Livre"
+                data-title="Welton Fortes"
+                data-location="Florianópolis · SC"
+                data-metric="R$ 11.063,33 de recorrência total"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Welton Fortes"
+                >
+                  <img
+                    src="./img/provas/livre-welton.jpg"
+                    alt="Destaque Conexão Livre - Welton Fortes"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Telecom"
+                data-title="Wagner Matos"
+                data-location="Volta Grande · MG"
+                data-metric="140 portabilidades"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Wagner Matos"
+                >
+                  <img
+                    src="./img/provas/telecom-wagner-140.jpg"
+                    alt="Destaque Conexão Telecom - Wagner Matos"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Telecom"
+                data-title="Eduardo Voss"
+                data-location="Pelotas · RS"
+                data-metric="339 portabilidades"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Eduardo Voss"
+                >
+                  <img
+                    src="./img/provas/telecom-eduardo-339.jpg"
+                    alt="Destaque Conexão Telecom - Eduardo Voss"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Telecom"
+                data-title="Gustavo Augusto"
+                data-location="Pelotas · RS"
+                data-metric="146 portabilidades"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Gustavo Augusto"
+                >
+                  <img
+                    src="./img/provas/telecom-gustavo-146.jpg"
+                    alt="Destaque Conexão Telecom - Gustavo Augusto"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Seguros"
+                data-title="Eliana Pires e André Marques"
+                data-location="Florianópolis · SC"
+                data-metric="37 vendas"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Eliana Pires e André Marques"
+                >
+                  <img
+                    src="./img/provas/seguros-eliana-andre-37.jpg"
+                    alt="Destaque Conexão Seguros - Eliana Pires e André Marques"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Seguros"
+                data-title="Willian da Costa"
+                data-location="União da Vitória · PR"
+                data-metric="33 vendas"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Willian da Costa"
+                >
+                  <img
+                    src="./img/provas/seguros-willian-33.jpg"
+                    alt="Destaque Conexão Seguros - Willian da Costa"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Solar"
+                data-title="Silas Eustáquio"
+                data-location="Bragança Paulista · SP"
+                data-metric="R$ 3.497,76 em bônus"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Silas Eustáquio"
+                >
+                  <img
+                    src="./img/provas/solar-silas.jpg"
+                    alt="Destaque Conexão Solar - Silas Eustáquio"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Placas"
+                data-title="Junior e Aline Cristine"
+                data-location="Tupi · SP"
+                data-metric="538 kWh de geração mensal"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar case de Junior e Aline Cristine"
+                >
+                  <img
+                    src="./img/provas/placas-cliente-junior-aline.jpg"
+                    alt="Cliente Conexão Placas - Junior e Aline Cristine"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Placas"
+                data-title="Beatriz Bonifácio"
+                data-location="Angra dos Reis · RJ"
+                data-metric="R$ 132.321,70 em valor de venda"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Beatriz Bonifácio"
+                >
+                  <img
+                    src="./img/provas/placas-beatriz.jpg"
+                    alt="Destaque Conexão Placas - Beatriz Bonifácio"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+              <article
+                class="proof-slide"
+                data-category="Placas"
+                data-title="Irany Arruda"
+                data-location="Martinho Campos · MG"
+                data-metric="R$ 147.798,98 em valor de venda"
+              >
+                <button
+                  class="proof-image-button"
+                  type="button"
+                  aria-label="Ampliar resultado de Irany Arruda"
+                >
+                  <img
+                    src="./img/provas/placas-irany.jpg"
+                    alt="Destaque Conexão Placas - Irany Arruda"
+                    loading="lazy"
+                  />
+                </button>
+              </article>
+            </div>
+
+            <div class="proof-info">
+              <div class="proof-person">
+                <span class="proof-category" id="proofCategory">Expansão</span>
+                <h3 id="proofTitle">Welicon Moreira</h3>
+                <p id="proofLocation">Colatina · ES</p>
+              </div>
+              <div class="proof-metric" aria-live="polite">
+                <small>DESTAQUE DO CASE</small>
+                <strong id="proofMetric">50 licenciados conectados</strong>
+              </div>
+              <div class="proof-nav">
+                <button
+                  class="proof-arrow"
+                  id="proofPrev"
+                  type="button"
+                  aria-label="Resultado anterior"
+                >
+                  ←
+                </button>
+                <div class="proof-counter">
+                  <span id="proofCurrent">01</span><em>/</em
+                  ><span id="proofTotal">17</span>
+                </div>
+                <button
+                  class="proof-arrow"
+                  id="proofNext"
+                  type="button"
+                  aria-label="Próximo resultado"
+                >
+                  →
+                </button>
+              </div>
+            </div>
+            <div class="proof-progress"><i id="proofProgressBar"></i></div>
+          </div>
+
+          <div class="social-disclaimer">
+            Resultados individuais dependem de dedicação, estratégia, carteira,
+            condições de mercado e regras vigentes. As imagens acima não
+            constituem garantia de remuneração. Clique na imagem para ampliar.
+          </div>
+        </div>
+      </section>
+
+      <section class="video-proof-section">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>
+              Quando a pessoa fala, a prova fica
+              <span class="accent">mais humana.</span>
+            </h2>
+            <p>
+              Vídeos reais adicionam contexto, presença e credibilidade. Use o
+              áudio para conhecer histórias e apresentações dentro do
+              ecossistema.
+            </p>
+          </div>
+          <div class="video-grid">
+            <article class="video-card">
+              <div class="video-frame">
+                <video
+                  controls
+                  playsinline
+                  preload="metadata"
+                  poster="./img/posters/historia-green.jpg"
+                >
+                  <source src="./video/historia-green.mp4" type="video/mp4" />
+                </video>
+              </div>
+              <div class="video-copy">
+                <span>CONEXÃO GREEN</span>
+                <h3>Uma história real de construção e persistência</h3>
+                <p>
+                  Conteúdo de destaque da rede com trajetória e resultados
+                  apresentados em primeira pessoa.
+                </p>
+              </div>
+            </article>
+            <article class="video-card">
+              <div class="video-frame">
+                <video
+                  controls
+                  playsinline
+                  preload="metadata"
+                  poster="./img/posters/conexao-solar.jpg"
+                >
+                  <source src="./video/conexao-solar.mp4" type="video/mp4" />
+                </video>
+              </div>
+              <div class="video-copy">
+                <span>CONEXÃO SOLAR</span>
+                <h3>Apresentação de solução solar na prática</h3>
+                <p>
+                  Material que ajuda o prospect a visualizar como as soluções
+                  também se transformam em histórias de clientes.
+                </p>
+              </div>
+            </article>
+            <article class="video-card">
+              <div class="video-frame">
+                <video
+                  controls
+                  playsinline
+                  preload="metadata"
+                  poster="./img/posters/wesley-expansao.jpg"
+                >
+                  <source src="./video/wesley-expansao.mp4" type="video/mp4" />
+                </video>
+              </div>
+              <div class="video-copy">
+                <span>CONEXÃO EXPANSÃO</span>
+                <h3>Wesley Renato e a construção de rede</h3>
+                <p>
+                  Um caso de expansão que reforça o lado humano por trás dos
+                  números e qualificações.
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="profile-section dark-band">
         <div class="wrap profile">
           <div class="profile-visual">
             <div class="visual-copy">
@@ -253,11 +830,8 @@
             </div>
           </div>
           <div>
-            <div
-              class="section-head"
-              style="display: block; margin-bottom: 25px"
-            >
-              <h2 style="font-size: 52px">
+            <div class="section-head section-head-single">
+              <h2>
                 Para quem essa oportunidade
                 <span class="accent">faz sentido?</span>
               </h2>
@@ -308,7 +882,7 @@
         </div>
       </section>
 
-      <section class="dark-band">
+      <section>
         <div class="wrap">
           <div class="section-head">
             <h2>
@@ -316,8 +890,8 @@
               <span class="accent">A estrutura já existe.</span>
             </h2>
             <p>
-              A documentação pública da iGreen apresenta ferramentas e canais
-              próprios para capacitação, operação e suporte ao licenciado.
+              Ferramentas digitais, capacitação e suporte ajudam a transformar a
+              oportunidade em uma operação mais organizada.
             </p>
           </div>
           <div class="cards">
@@ -349,21 +923,112 @@
         </div>
       </section>
 
-      <section id="investimento">
+      <section class="partnership-section dark-band">
+        <div class="wrap partnership-grid">
+          <div>
+            <span class="section-kicker">FORÇA DE MARCA</span>
+            <h2>
+              Parcerias que ajudam a colocar a iGreen
+              <span class="accent">em outro patamar de visibilidade.</span>
+            </h2>
+            <p>
+              A própria iGreen destaca uma parceria estratégica envolvendo
+              Gusttavo Lima, BP Seguradora e iGreen, além da expansão do
+              ecossistema para novas frentes de serviços.
+            </p>
+            <div
+              class="partner-line"
+              aria-label="Parceria estratégica divulgada pela iGreen"
+            >
+              <strong>Gusttavo Lima</strong><span>+</span
+              ><strong>BP Seguradora</strong><span>+</span
+              ><strong>iGreen</strong>
+            </div>
+            <small class="source-note source-note-inline"
+              >Referência institucional: site oficial iGreen, consultado em
+              agosto de 2026.</small
+            >
+          </div>
+          <div class="market-card">
+            <span class="section-kicker">ATUAÇÃO NACIONAL E INTERNACIONAL</span>
+            <strong>Brasil → Estados Unidos</strong>
+            <p>
+              A expansão da iGreen Mobile para os Estados Unidos reforça a
+              estratégia de crescimento e posicionamento internacional da marca.
+            </p>
+            <div class="market-points">
+              <span>21+ estados</span><span>1.000+ usinas</span
+              ><span>30+ distribuidoras</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="recognition-section">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>
+              Não é só venda. Existe uma jornada de
+              <span class="accent">qualificação e reconhecimento.</span>
+            </h2>
+            <p>
+              O plano de negócios iGreen apresenta níveis, campanhas,
+              premiações, viagens e reconhecimento conforme qualificações e
+              regras vigentes.
+            </p>
+          </div>
+          <div class="recognition-journey">
+            <article>
+              <span>01</span>
+              <h3>Construção de carteira</h3>
+              <p>
+                O ponto de partida é conectar clientes e desenvolver
+                consistência comercial.
+              </p>
+            </article>
+            <article>
+              <span>02</span>
+              <h3>Qualificações</h3>
+              <p>
+                A evolução na rede desbloqueia novos níveis de reconhecimento
+                conforme o plano vigente.
+              </p>
+            </article>
+            <article>
+              <span>03</span>
+              <h3>Premiações</h3>
+              <p>
+                Campanhas podem incluir benefícios e premiações vinculados a
+                metas e qualificações.
+              </p>
+            </article>
+            <article>
+              <span>04</span>
+              <h3>Viagens e experiências</h3>
+              <p>
+                O material oficial apresenta viagens e reconhecimento como parte
+                da jornada de qualificação.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="investimento" class="dark-band">
         <div class="wrap price-panel">
           <div class="price-grid">
             <div>
-              <span class="eyebrow"><i></i> Licença Connect</span>
-              <h2 style="margin-top: 20px">
+              <span class="eyebrow"><i></i> Licença Connect Full</span>
+              <h2>
                 Sua porta de entrada para o
-                <span class="accent">ecossistema.</span>
+                <span class="accent">ecossistema completo.</span>
               </h2>
               <div class="price-features">
                 <span class="pill">Plataforma iGreen</span>
-                <span class="pill">Conexões do portfólio</span>
-                <span class="pill">iGreen Academy</span>
-                <span class="pill">Materiais de apoio</span>
+                <span class="pill">Todas as conexões</span>
+                <span class="pill">Escritório Virtual</span>
                 <span class="pill">Suporte ao licenciado</span>
+                <span class="pill">iGreen Club</span>
                 <span class="pill">Validade anual</span>
               </div>
             </div>
@@ -376,10 +1041,7 @@
                 ou R$ 1.997 à vista. Valores e condições podem ser alterados
                 pela iGreen; confirme no momento da ativação.
               </div>
-              <a
-                class="btn btn-primary"
-                style="margin-top: 22px; width: 100%"
-                href="#avaliacao"
+              <a class="btn btn-primary price-btn" href="#avaliacao"
                 >QUERO ENTENDER SE É PARA MIM →</a
               >
             </div>
@@ -387,7 +1049,7 @@
         </div>
       </section>
 
-      <section id="avaliacao" class="dark-band">
+      <section id="avaliacao" class="quiz-section">
         <div class="wrap">
           <div class="section-head">
             <h2>
@@ -510,7 +1172,7 @@
               <h3>Para receber a apresentação e avançar, deixe seus dados.</h3>
               <div class="form-grid">
                 <div class="field">
-                  <label>Nome</label
+                  <label for="nome">Nome</label
                   ><input
                     id="nome"
                     autocomplete="name"
@@ -518,7 +1180,7 @@
                   />
                 </div>
                 <div class="field">
-                  <label>WhatsApp</label
+                  <label for="whats">WhatsApp</label
                   ><input
                     id="whats"
                     inputmode="tel"
@@ -527,7 +1189,7 @@
                   />
                 </div>
                 <div class="field">
-                  <label>Cidade</label
+                  <label for="cidade">Cidade</label
                   ><input
                     id="cidade"
                     autocomplete="address-level2"
@@ -535,7 +1197,7 @@
                   />
                 </div>
                 <div class="field">
-                  <label>E-mail</label
+                  <label for="email">E-mail</label
                   ><input
                     id="email"
                     type="email"
@@ -544,7 +1206,7 @@
                   />
                 </div>
                 <div class="field full">
-                  <label>Momento</label>
+                  <label for="momento">Momento</label>
                   <select id="momento">
                     <option value="">Selecione</option>
                     <option>Quero conhecer antes de decidir</option>
@@ -553,7 +1215,7 @@
                   </select>
                 </div>
               </div>
-              <p style="color: #839087; font-size: 12px; margin: 13px 0 0">
+              <p class="privacy-note">
                 Ao avançar, você concorda em ser contatado sobre a oportunidade
                 de licenciamento. Seus dados devem ser tratados conforme a
                 política de privacidade da operação.
@@ -566,10 +1228,10 @@
                 <strong id="resultTitle"
                   >Seu perfil tem pontos de aderência ao modelo.</strong
                 >
-                <p id="resultText" style="color: #acb7af; margin: 8px 0 0"></p>
+                <p id="resultText"></p>
               </div>
               <h3>Próximo passo: conhecer a ativação e as regras atuais.</h3>
-              <p style="color: #9da89f; max-width: 720px">
+              <p class="result-explain">
                 A decisão deve ser feita depois de conhecer contrato, regras de
                 bonificação, renovação da licença e política de uso da marca.
                 Não há garantia de faturamento ou resultado.
@@ -585,14 +1247,8 @@
             </div>
 
             <div class="quiz-actions">
-              <button class="back" id="backBtn" style="visibility: hidden">
-                ← Voltar
-              </button>
-              <button
-                class="btn btn-primary"
-                id="nextBtn"
-                style="display: none"
-              >
+              <button class="back" id="backBtn" type="button">← Voltar</button>
+              <button class="btn btn-primary" id="nextBtn" type="button">
                 CONTINUAR →
               </button>
             </div>
@@ -600,7 +1256,7 @@
         </div>
       </section>
 
-      <section>
+      <section class="dark-band faq-section">
         <div class="wrap">
           <div class="section-head">
             <h2>
@@ -635,17 +1291,26 @@
               <summary>Preciso ter loja ou estoque?</summary>
               <p>
                 A operação é apresentada como digital e apoiada por plataforma,
-                aplicativos, materiais e canais online. Alguns produtos/serviços
-                podem possuir processos específicos.
+                aplicativos, materiais e canais online. Alguns produtos e
+                serviços podem possuir processos específicos.
               </p>
             </details>
             <details>
               <summary>Qual é o valor da licença?</summary>
               <p>
-                A página pública de licenças consultada em agosto de 2026
-                informa a Licença Connect por R$ 1.997 à vista ou até 12x de R$
-                197,41, válida por 1 ano, com renovação anual. Confirme valores
-                e condições atuais antes do pagamento.
+                O plano público consultado em agosto de 2026 informa a Connect
+                Full por R$ 1.997 à vista ou até 12x de R$ 197,41, válida por 1
+                ano. Confirme valores e condições atuais antes do pagamento.
+              </p>
+            </details>
+            <details>
+              <summary>
+                Os resultados mostrados na página são garantidos?
+              </summary>
+              <p>
+                Não. Eles representam casos individuais presentes nos materiais
+                enviados para a página. O desempenho varia conforme dedicação,
+                estratégia, carteira, região, produtos e regras vigentes.
               </p>
             </details>
             <details>
@@ -683,17 +1348,40 @@
 
     <footer>
       <div class="wrap">
-        Protótipo de landing page para captação de interessados em licenciamento
+        Landing page independente para captação de interessados em licenciamento
         iGreen Energy. Não representa promessa de ganho. Informações de valores,
-        produtos e regras devem ser confirmadas nos canais oficiais antes da
-        publicação definitiva. iGreen e marcas relacionadas pertencem aos
-        respectivos titulares.
+        produtos, campanhas, premiações e regras devem ser confirmadas nos
+        canais oficiais antes da decisão. iGreen e marcas relacionadas pertencem
+        aos respectivos titulares.
       </div>
     </footer>
 
     <div class="mobile-bar">
       <a class="btn btn-primary" href="#avaliacao">AVALIAR MEU PERFIL →</a>
     </div>
-    <div class="toast" id="toast">Selecione uma opção para continuar.</div>
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      Selecione uma opção para continuar.
+    </div>
+
+    <div
+      class="lightbox"
+      id="lightbox"
+      aria-hidden="true"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Imagem ampliada da prova social"
+    >
+      <button
+        class="lightbox-close"
+        id="lightboxClose"
+        type="button"
+        aria-label="Fechar imagem"
+      >
+        ×
+      </button>
+      <img id="lightboxImage" alt="" />
+    </div>
+
+    <script src="./script.js" defer></script>
   </body>
 </html>
