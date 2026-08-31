@@ -1,9 +1,6 @@
 const CONFIG = {
   webhookUrl: "",
-
   checkoutUrl: "https://expansao.igreenenergy.com.br/?id=29284&checkout=true",
-
-  // Somente números: DDI + DDD + número
   whatsappNumber: "5527988021747",
 };
 
@@ -611,3 +608,107 @@ if (backToTop) {
    */
   updateBackToTop();
 }
+
+// -------------------------
+// Cliente iGreen / popup + WhatsApp
+// -------------------------
+const clientModal = document.getElementById("clientModal");
+const openClientModalBtn = document.getElementById("openClientModal");
+const clientLeadForm = document.getElementById("clientLeadForm");
+const clientCloseButtons = document.querySelectorAll("[data-client-close]");
+
+function openClientModal() {
+  if (!clientModal) return;
+
+  clientModal.classList.add("is-open");
+  clientModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("client-modal-open");
+
+  window.setTimeout(() => {
+    document.getElementById("clientName")?.focus();
+  }, 150);
+}
+
+function closeClientModal() {
+  if (!clientModal) return;
+
+  clientModal.classList.remove("is-open");
+  clientModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("client-modal-open");
+}
+
+function createClientWhatsAppLink(data) {
+  const message = [
+    "Olá! Quero conhecer as soluções para ser cliente iGreen.",
+    "",
+    `Nome: ${data.name}`,
+    `WhatsApp: ${data.phone}`,
+    `E-mail: ${data.email}`,
+    `Cidade/UF: ${data.city}`,
+    `Interesse principal: ${data.interest}`,
+    `Perfil: ${data.profile}`,
+  ];
+
+  if (data.observation) {
+    message.push(`Observação: ${data.observation}`);
+  }
+
+  message.push(
+    "",
+    "Acabei de preencher o formulário no site e gostaria de continuar meu atendimento.",
+  );
+
+  return `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message.join("\n"))}`;
+}
+
+openClientModalBtn?.addEventListener("click", openClientModal);
+
+clientCloseButtons.forEach((button) => {
+  button.addEventListener("click", closeClientModal);
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && clientModal?.classList.contains("is-open")) {
+    closeClientModal();
+  }
+});
+
+clientLeadForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const name = document.getElementById("clientName")?.value.trim() || "";
+  const phone = document.getElementById("clientPhone")?.value.trim() || "";
+  const email = document.getElementById("clientEmail")?.value.trim() || "";
+  const city = document.getElementById("clientCity")?.value.trim() || "";
+  const interest = document.getElementById("clientInterest")?.value || "";
+  const profile = document.getElementById("clientProfile")?.value || "";
+  const observation =
+    document.getElementById("clientObservation")?.value.trim() || "";
+  const consent = document.getElementById("clientConsent")?.checked;
+
+  if (!name || !phone || !email || !city || !interest || !profile || !consent) {
+    showToast("Preencha os campos obrigatórios para continuar.");
+    return;
+  }
+
+  const phoneDigits = phone.replace(/\D/g, "");
+
+  if (phoneDigits.length < 10 || phoneDigits.length > 13) {
+    showToast("Informe um WhatsApp válido.");
+    return;
+  }
+
+  const clientData = {
+    name,
+    phone,
+    email,
+    city,
+    interest,
+    profile,
+    observation,
+  };
+
+  const whatsappUrl = createClientWhatsAppLink(clientData);
+
+  window.location.href = whatsappUrl;
+});

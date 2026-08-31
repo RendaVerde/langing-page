@@ -1008,7 +1008,7 @@
           </div>
           <div class="recognition-journey">
             <article>
-              <span>01</span>
+              <span class="num">01</span>
               <h3>Construção de carteira</h3>
               <p>
                 O ponto de partida é conectar clientes e desenvolver
@@ -1016,7 +1016,7 @@
               </p>
             </article>
             <article>
-              <span>02</span>
+              <span class="num">02</span>
               <h3>Qualificações</h3>
               <p>
                 A evolução na rede desbloqueia novos níveis de reconhecimento
@@ -1024,7 +1024,7 @@
               </p>
             </article>
             <article>
-              <span>03</span>
+              <span class="num">03</span>
               <h3>Premiações</h3>
               <p>
                 Campanhas podem incluir benefícios e premiações vinculados a
@@ -1032,7 +1032,7 @@
               </p>
             </article>
             <article>
-              <span>04</span>
+              <span class="num">04</span>
               <h3>Viagens e experiências</h3>
               <p>
                 O material oficial apresenta viagens e reconhecimento como parte
@@ -1073,6 +1073,52 @@
               <a class="btn btn-primary price-btn" href="#avaliacao"
                 >QUERO ENTENDER SE É PARA MIM →</a
               >
+            </div>
+          </div>
+        </div>
+
+        <div class="wrap price-panel client-price-panel">
+          <div class="price-grid">
+            <div>
+              <span class="eyebrow"
+                ><i></i> Cliente iGreen • Acesso Gratuito</span
+              >
+
+              <h2>
+                Sua porta de entrada gratuita para
+                <span class="accent">economia e benefícios.</span>
+              </h2>
+
+              <div class="price-features">
+                <span class="pill">Economia em energia</span>
+                <span class="pill">Telecom e conectividade</span>
+                <span class="pill">Seguros</span>
+                <span class="pill">Cashback por indicações</span>
+                <span class="pill">Clube de descontos</span>
+                <span class="pill">App iGreen Club</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="kicker">CADASTRO GRATUITO</div>
+
+              <div class="client-free-price">
+                <sup>R$</sup>
+                <strong>0,00</strong>
+              </div>
+
+              <div class="price-note">
+                Entre como cliente e escolha energia, telecom, seguros ou
+                combine as soluções de acordo com o seu perfil.
+              </div>
+
+              <button
+                class="btn btn-primary price-btn"
+                id="openClientModal"
+                type="button"
+              >
+                QUERO SER CLIENTE IGREEN →
+              </button>
             </div>
           </div>
         </div>
@@ -1521,6 +1567,150 @@
       ↑
     </button>
 
+    <div class="client-modal" id="clientModal" aria-hidden="true">
+      <div class="client-modal-backdrop" data-client-close></div>
+
+      <div
+        class="client-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="clientModalTitle"
+      >
+        <button
+          class="client-modal-close"
+          type="button"
+          data-client-close
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+
+        <span class="section-kicker">SEJA CLIENTE IGREEN</span>
+
+        <h2 id="clientModalTitle">
+          Conte rapidamente
+          <span class="accent">o que você procura.</span>
+        </h2>
+
+        <p class="client-modal-intro">
+          Essas informações serão incluídas na sua mensagem para que nosso time
+          já saiba como ajudar você quando o atendimento começar.
+        </p>
+
+        <form id="clientLeadForm">
+          <div class="client-form-grid">
+            <div class="field">
+              <label for="clientName">Nome completo</label>
+              <input
+                id="clientName"
+                name="name"
+                type="text"
+                autocomplete="name"
+                placeholder="Seu nome"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="clientPhone">WhatsApp</label>
+              <input
+                id="clientPhone"
+                name="phone"
+                type="tel"
+                inputmode="tel"
+                autocomplete="tel"
+                placeholder="(27) 99999-9999"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="clientEmail">E-mail</label>
+              <input
+                id="clientEmail"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="voce@email.com"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="clientCity">Cidade / UF</label>
+              <input
+                id="clientCity"
+                name="city"
+                type="text"
+                autocomplete="address-level2"
+                placeholder="Vitória / ES"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="clientInterest">Principal interesse</label>
+              <select id="clientInterest" name="interest" required>
+                <option value="">Selecione</option>
+                <option>Reduzir minha conta de energia</option>
+                <option>Conhecer os planos de telecom</option>
+                <option>Conhecer os seguros</option>
+                <option>Energia + Telecom</option>
+                <option>Energia + Seguros</option>
+                <option>Telecom + Seguros</option>
+                <option>Quero conhecer todas as soluções</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="clientProfile">Para quem são as soluções?</label>
+              <select id="clientProfile" name="profile" required>
+                <option value="">Selecione</option>
+                <option>Para mim / minha residência</option>
+                <option>Para minha empresa</option>
+                <option>Para residência e empresa</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label for="clientObservation">
+                Observação <span class="field-optional">(opcional)</span>
+              </label>
+
+              <textarea
+                id="clientObservation"
+                name="observation"
+                rows="3"
+                placeholder="Se quiser, conte algo que ajude nosso time a entender melhor sua necessidade."
+              ></textarea>
+            </div>
+          </div>
+
+          <label class="client-consent">
+            <input id="clientConsent" type="checkbox" required />
+            <span>
+              Concordo em iniciar o atendimento pelo WhatsApp sobre as soluções
+              iGreen.
+            </span>
+          </label>
+
+          <button class="btn btn-primary client-submit" type="submit">
+            CONTINUAR NO WHATSAPP →
+          </button>
+        </form>
+      </div>
+    </div>
+
     <script src="./script.js" defer></script>
+
+    <!-- Vercel Web Analytics -->
+    <script>
+      window.va =
+        window.va ||
+        function () {
+          (window.vaq = window.vaq || []).push(arguments);
+        };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
   </body>
 </html>
