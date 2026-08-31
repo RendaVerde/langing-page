@@ -566,3 +566,48 @@ if (bpYoutubeIframe && bpVideoSection) {
     });
   };
 }
+
+// -------------------------
+// Botão voltar ao topo
+// -------------------------
+
+const backToTop = document.getElementById("backToTop");
+
+function updateBackToTop() {
+  if (!backToTop) return;
+
+  /*
+   * O botão só aparece depois que
+   * o visitante se afastou do início.
+   */
+  const shouldShow = window.scrollY > 500;
+
+  backToTop.classList.toggle("is-visible", shouldShow);
+}
+
+if (backToTop) {
+  /*
+   * Controla a exibição conforme
+   * a rolagem da página.
+   */
+  window.addEventListener("scroll", updateBackToTop, {
+    passive: true,
+  });
+
+  /*
+   * Clique → volta suavemente
+   * para o início.
+   */
+  backToTop.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  });
+
+  /*
+   * Define o estado correto
+   * assim que a página carregar.
+   */
+  updateBackToTop();
+}
