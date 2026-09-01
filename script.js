@@ -1,7 +1,9 @@
 const CONFIG = {
-  webhookUrl: "",
   checkoutUrl: "https://expansao.igreenenergy.com.br/?id=29284&checkout=true",
   whatsappNumber: "5527988021747",
+  sheetEndpoint:
+    "https://script.google.com/macros/s/AKfycbwrCkcX0mvzbihwCQVqYVoKgnTStFOPb6qkco_47DFNLrP6o1LMoOjErDqX5LyYGgH45Q/exec",
+  sheetSiteId: "rendaverde-igreen",
 };
 
 // -------------------------
@@ -169,43 +171,29 @@ async function submitLead() {
   const wantsMoreInformation =
     lead.momento === "Quero conhecer antes de decidir";
 
+  const licensedLead = {
+    tipo: "licenciado",
+    lead_id: createLeadId(),
+
+    nome: lead.nome,
+    whatsapp: lead.whatsapp,
+    email: lead.email,
+    cidade: lead.cidade,
+
+    objetivo: answers.objetivo || "",
+    tempo: answers.tempo || "",
+    perfil: answers.perfil || "",
+    momento: lead.momento,
+    score: lead.score,
+
+    rota_resultado: wantsMoreInformation ? "WhatsApp" : "Ativação / WhatsApp",
+
+    ...getTrackingData(),
+  };
+
+  await saveLeadToSheet(licensedLead);
+
   lead.destination = wantsMoreInformation ? "whatsapp" : "activation";
-
-  /*
-   * SALVA LOCALMENTE
-   */
-
-  localStorage.setItem("igreen_lead_last", JSON.stringify(lead));
-
-  /*
-   * HISTÓRICO LOCAL
-   */
-
-  const savedLeads = JSON.parse(localStorage.getItem("igreen_leads") || "[]");
-
-  savedLeads.push(lead);
-
-  localStorage.setItem("igreen_leads", JSON.stringify(savedLeads));
-
-  /*
-   * ENVIA PARA WEBHOOK / N8N / CRM
-   */
-
-  if (CONFIG.webhookUrl) {
-    try {
-      await fetch(CONFIG.webhookUrl, {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-        },
-
-        body: JSON.stringify(lead),
-      });
-    } catch (error) {
-      console.warn("Webhook indisponível:", error);
-    }
-  }
 
   /*
    * TELAS DE RESULTADO
@@ -679,7 +667,7 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-clientLeadForm?.addEventListener("submit", (event) => {
+clientLeadForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const name = document.getElementById("clientName")?.value.trim() || "";
@@ -704,6 +692,13 @@ clientLeadForm?.addEventListener("submit", (event) => {
     return;
   }
 
+  const submitButton = clientLeadForm.querySelector('button[type="submit"]');
+
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = "ABRINDO WHATSAPP...";
+  }
+
   const clientData = {
     name,
     phone,
@@ -714,12 +709,29 @@ clientLeadForm?.addEventListener("submit", (event) => {
     observation,
   };
 
+  const sheetLead = {
+    tipo: "cliente",
+    lead_id: createLeadId(),
+    nome: name,
+    whatsapp: phone,
+    email,
+    cidade: city,
+    interesse: interest,
+    perfil: profile,
+    observacao: observation,
+    ...getTrackingData(),
+  };
+
   const whatsappUrl = createClientWhatsAppLink(clientData);
 
-  gtag("event", "clique_whatsapp_cliente", {
-    event_category: "conversao",
-    event_label: "cliente_igreen",
-  });
+  await saveLeadToSheet(sheetLead);
+
+  if (typeof gtag === "function") {
+    gtag("event", "clique_whatsapp_cliente", {
+      event_category: "conversao",
+      event_label: "cliente_igreen",
+    });
+  }
 
   window.location.href = whatsappUrl;
 });
@@ -781,4 +793,75 @@ if (mobileQuery.addEventListener) {
   mobileQuery.addEventListener("change", resetEcoStateOnDesktop);
 } else {
   mobileQuery.addListener(resetEcoStateOnDesktop);
+}
+
+// -------------------------
+// Google Sheets / Leads
+// -------------------------
+
+function createLeadId() {
+  if (window.crypto?.randomUUID) {
+    return crypto.randomUUID();
+  }
+
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+function getTrackingData() {
+  const params = new URLSearchParams(window.location.search);
+
+  return {
+    utm_source: params.get("utm_source") || "",
+    utm_medium: params.get("utm_medium") || "",
+    utm_campaign: params.get("utm_campaign") || "",
+    utm_content: params.get("utm_content") || "",
+    gclid: params.get("gclid") || "",
+    fbclid: params.get("fbclid") || "",
+    page_url: window.location.href,
+  };
+}
+
+async function saveLeadToSheet(data) {
+  if (!CONFIG.sheetEndpoint) {
+    console.warn("Google Sheets endpoint não configurado.");
+    return false;
+  }
+
+  const payload = {
+    site_id: CONFIG.sheetSiteId,
+    ...data,
+  };
+
+  const formData = new URLSearchParams();
+  formData.set("payload", JSON.stringify(payload));
+
+  /*
+   * sendBeacon é ideal para este caso porque
+   * a página pode redirecionar logo depois.
+   */
+  if (navigator.sendBeacon) {
+    const queued = navigator.sendBeacon(CONFIG.sheetEndpoint, formData);
+
+    if (queued) {
+      return true;
+    }
+  }
+
+  /*
+   * Fallback para navegadores onde Beacon
+   * não conseguiu enfileirar a requisição.
+   */
+  try {
+    await fetch(CONFIG.sheetEndpoint, {
+      method: "POST",
+      mode: "no-cors",
+      body: formData,
+      keepalive: true,
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Falha ao enviar lead:", error);
+    return false;
+  }
 }
