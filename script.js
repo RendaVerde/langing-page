@@ -248,7 +248,13 @@ async function submitLead() {
 
     const resultTitle = document.getElementById("resultTitle");
     const resultText = document.getElementById("resultText");
-    const checkoutBtn = document.getElementById("checkoutBtn");
+    const checkoutBtn = document
+      .getElementById("checkoutBtn")
+      ?.addEventListener("click", () => {
+        gtag("event", "clique_ativar_licenca", {
+          event_category: "conversao",
+        });
+      });
     const activationWhatsappBtn = document.getElementById(
       "activationWhatsappBtn",
     );
@@ -709,6 +715,11 @@ clientLeadForm?.addEventListener("submit", (event) => {
   };
 
   const whatsappUrl = createClientWhatsAppLink(clientData);
+
+  gtag("event", "clique_whatsapp_cliente", {
+    event_category: "conversao",
+    event_label: "cliente_igreen",
+  });
 
   window.location.href = whatsappUrl;
 });
