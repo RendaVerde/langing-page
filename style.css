@@ -2456,3 +2456,37 @@ footer {
   font-size: 15px !important;
   line-height: 1.6;
 }
+
+#avaliacao .quiz-head-full {
+  display: block;
+  margin-bottom: 30px;
+}
+
+#avaliacao .quiz-head-full h2 {
+  max-width: 100%;
+  width: 100%;
+}
+
+#avaliacao .quiz {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  #avaliacao .quiz-head-full {
+    margin-bottom: 26px;
+  }
+
+  #avaliacao .quiz-head-full h2 {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 620px) {
+  #avaliacao .quiz-head-full {
+    margin-bottom: 22px;
+  }
+
+  #avaliacao .quiz-head-full h2 {
+    max-width: 100%;
+  }
+}
