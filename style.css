@@ -559,6 +559,15 @@ h2 {
   line-height: 1.65;
 }
 
+#ecossistema {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+#ecossistema .ecosystem {
+  margin-top: 14px;
+}
+
 .ecosystem {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
