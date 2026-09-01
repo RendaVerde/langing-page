@@ -2312,3 +2312,147 @@ body.client-modal-open {
     font-size: 16px;
   }
 }
+
+/* =====================================================
+   PADRÃO GLOBAL DE LEGIBILIDADE
+   Nenhum texto informativo abaixo de 15px
+   MANTER ESTE BLOCO NO FINAL DO STYLE.CSS
+   ===================================================== */
+
+:root {
+  --font-min: 15px;
+}
+
+/* Navegação, tags, labels e elementos de interface */
+.nav-cta,
+.eyebrow,
+.eco-more,
+.proof-category,
+.video-copy span,
+.visual-copy small,
+.recognition-journey span,
+label,
+.proof-filter,
+.proof-metric small {
+  font-size: var(--font-min);
+  line-height: 1.35;
+}
+
+/* Textos auxiliares, notas e informações secundárias */
+.micro,
+.mini-row,
+.number-card span,
+.source-note,
+.recognition span,
+.forbes-card small,
+.eco-benefits li,
+.proof-info p,
+.social-disclaimer,
+.video-copy p,
+.check em,
+.market-points span,
+.recognition-journey p,
+.privacy-note,
+footer,
+.toast,
+.whatsapp-benefits span,
+.whatsapp-result-card small,
+.decision-help strong,
+.decision-help span,
+.client-consent,
+.proof-counter {
+  font-size: var(--font-min);
+  line-height: 1.55;
+}
+
+/* Ícone/check dentro do círculo */
+.dot {
+  font-size: var(--font-min);
+}
+
+/* Formulários:
+   16px melhora leitura e também evita zoom automático
+   em alguns navegadores mobile */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+/* Melhora de contraste nos textos institucionais pequenos */
+.number-card span {
+  color: #a6b1a9;
+}
+
+.source-note {
+  color: #818d84;
+  line-height: 1.55;
+}
+
+.social-disclaimer {
+  color: #818d84;
+  line-height: 1.6;
+}
+
+footer {
+  color: #87928a;
+  line-height: 1.6;
+}
+
+.proof-info p {
+  color: #939f96;
+}
+
+.proof-metric small {
+  color: #89958d;
+}
+
+.video-copy p {
+  color: #9ba69e;
+}
+
+.check em {
+  color: #9eaaa1;
+}
+
+.privacy-note {
+  color: #939f97;
+}
+
+.client-consent {
+  color: #9ba69e;
+}
+
+/* Mantém o mínimo também no mobile,
+   sobrescrevendo regras antigas de 10px/12px */
+@media (max-width: 620px) {
+  .eyebrow,
+  .eco-more,
+  .proof-category,
+  .proof-counter,
+  .proof-filter,
+  .proof-metric small,
+  .source-note,
+  .social-disclaimer {
+    font-size: var(--font-min);
+  }
+}
+
+/* =====================================================
+   AJUSTE - JORNADA DE QUALIFICAÇÃO
+   ===================================================== */
+.recognition-journey article > span,
+.recognition-journey .num {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 20px !important;
+  line-height: 1.2;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--green2);
+}
+
+.recognition-journey p {
+  font-size: 15px !important;
+  line-height: 1.6;
+}

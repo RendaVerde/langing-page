@@ -236,19 +236,25 @@ async function submitLead() {
 
     const resultTitle = document.getElementById("resultTitle");
     const resultText = document.getElementById("resultText");
-    const checkoutBtn = document
-      .getElementById("checkoutBtn")
-      ?.addEventListener("click", () => {
-        gtag("event", "clique_ativar_licenca", {
-          event_category: "conversao",
-        });
-      });
+    const checkoutBtn = document.getElementById("checkoutBtn");
     const activationWhatsappBtn = document.getElementById(
       "activationWhatsappBtn",
     );
 
     if (checkoutBtn) {
       checkoutBtn.href = CONFIG.checkoutUrl;
+
+      checkoutBtn.onclick = () => {
+        if (typeof gtag === "function") {
+          gtag("event", "clique_ativar_licenca", {
+            event_category: "conversao",
+          });
+        }
+      };
+    }
+
+    if (activationWhatsappBtn) {
+      activationWhatsappBtn.href = createWhatsAppLink(lead);
     }
 
     if (activationWhatsappBtn) {
@@ -266,10 +272,6 @@ async function submitLead() {
 
     if (resultText) {
       resultText.textContent = `${lead.nome}, sua resposta indica foco em “${answers.objetivo || "avaliar a oportunidade"}”. O próximo passo é conhecer as regras atuais, contrato, portfólio e forma de atuação.`;
-    }
-
-    if (checkoutBtn) {
-      checkoutBtn.href = CONFIG.checkoutUrl;
     }
   }
 
