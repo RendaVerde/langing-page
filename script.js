@@ -723,3 +723,62 @@ clientLeadForm?.addEventListener("submit", (event) => {
 
   window.location.href = whatsappUrl;
 });
+
+const ecoCards = document.querySelectorAll("[data-eco]");
+const mobileQuery = window.matchMedia("(max-width: 620px)");
+
+function closeEco(card) {
+  card.classList.remove("is-open");
+  const trigger = card.querySelector(".eco-more");
+  if (trigger) {
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.innerHTML = "Ver vantagens ↓";
+  }
+}
+
+function openEco(card) {
+  card.classList.add("is-open");
+  const trigger = card.querySelector(".eco-more");
+  if (trigger) {
+    trigger.setAttribute("aria-expanded", "true");
+    trigger.innerHTML = "Ocultar vantagens ↑";
+  }
+}
+
+function closeAllEco(exceptCard = null) {
+  ecoCards.forEach((card) => {
+    if (card !== exceptCard) closeEco(card);
+  });
+}
+
+ecoCards.forEach((card) => {
+  const trigger = card.querySelector(".eco-more");
+  if (!trigger) return;
+
+  trigger.addEventListener("click", (e) => {
+    if (!mobileQuery.matches) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const isOpen = card.classList.contains("is-open");
+
+    if (isOpen) {
+      closeEco(card);
+    } else {
+      closeAllEco(card);
+      openEco(card);
+    }
+  });
+});
+
+function resetEcoStateOnDesktop(e) {
+  if (!e.matches) {
+    closeAllEco();
+  }
+}
+
+if (mobileQuery.addEventListener) {
+  mobileQuery.addEventListener("change", resetEcoStateOnDesktop);
+} else {
+  mobileQuery.addListener(resetEcoStateOnDesktop);
+}
