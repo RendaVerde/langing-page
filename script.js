@@ -484,80 +484,151 @@ videos.forEach((video) => {
     videos.forEach((other) => {
       if (other !== video && !other.paused) other.pause();
     });
+    pauseAllYoutubePlayers();
   });
 });
 
 // -------------------------
-// Vídeo BP / autoplay ao entrar na tela
+// Vídeos do YouTube / autoplay ao entrar na tela
 // -------------------------
+const youtubeAutoplayItems = [
+  ...document.querySelectorAll("[data-youtube-autoplay]"),
+]
+  .map((container) => {
+    const iframe = container.querySelector("iframe[id]");
 
-const bpYoutubeIframe = document.getElementById("bpYoutubeVideo");
-const bpVideoSection = bpYoutubeIframe?.closest(".partnership-video");
+    if (!iframe) return null;
 
-let bpYoutubePlayer = null;
-let bpYoutubeReady = false;
-let bpVideoVisible = false;
+    return {
+      container,
+      iframe,
+      player: null,
+      ready: false,
+      visible: false,
+      soundEnabled: false,
+      soundButton: null,
+    };
+  })
+  .filter(Boolean);
 
-/**
- * Executa a reprodução conforme a posição atual da seção.
- * O vídeo inicia mudo porque os navegadores bloqueiam
- * autoplay automático com áudio.
- */
-function updateBpYoutubePlayback() {
-  if (!bpYoutubeReady || !bpYoutubePlayer) return;
+function pauseAllYoutubePlayers(exceptPlayer = null) {
+  youtubeAutoplayItems.forEach((item) => {
+    if (!item.ready || !item.player || item.player === exceptPlayer) return;
 
-  if (bpVideoVisible) {
-    bpYoutubePlayer.mute();
-    bpYoutubePlayer.playVideo();
-  } else {
-    bpYoutubePlayer.pauseVideo();
+    try {
+      item.player.pauseVideo();
+    } catch (error) {
+      console.warn("Não foi possível pausar um vídeo do YouTube.", error);
+    }
+  });
+}
+
+function updateYoutubePlayback(item) {
+  if (!item.ready || !item.player) return;
+
+  try {
+    if (item.visible) {
+      pauseAllYoutubePlayers(item.player);
+      videos.forEach((video) => {
+        if (!video.paused) video.pause();
+      });
+
+      /*
+       * O autoplay começa mudo para respeitar as políticas dos navegadores.
+       * O som só é liberado após um clique real do visitante.
+       */
+      item.player.setVolume(100);
+      if (item.soundEnabled) {
+        item.player.unMute();
+      } else {
+        item.player.mute();
+      }
+      item.player.playVideo();
+      item.soundButton?.classList.toggle("is-visible", !item.soundEnabled);
+    } else {
+      item.player.pauseVideo();
+      item.soundButton?.classList.remove("is-visible");
+    }
+  } catch (error) {
+    console.warn("Não foi possível atualizar o vídeo do YouTube.", error);
   }
 }
 
-if (bpYoutubeIframe && bpVideoSection) {
-  // Carrega a API oficial do YouTube
-  const youtubeApiScript = document.createElement("script");
+function initializeYoutubeAutoplayPlayers() {
+  youtubeAutoplayItems.forEach((item) => {
+    if (!item.soundButton) {
+      const soundButton = document.createElement("button");
+      soundButton.className = "youtube-sound-toggle";
+      soundButton.type = "button";
+      soundButton.setAttribute("aria-label", "Ativar som do vídeo");
+      soundButton.textContent = "ATIVAR SOM";
+      soundButton.addEventListener("click", () => {
+        if (!item.ready || !item.player) return;
 
-  youtubeApiScript.src = "https://www.youtube.com/iframe_api";
-  youtubeApiScript.async = true;
+        item.soundEnabled = true;
+        item.player.unMute();
+        item.player.setVolume(100);
+        item.player.playVideo();
+        soundButton.classList.remove("is-visible");
+      });
+      item.container.appendChild(soundButton);
+      item.soundButton = soundButton;
+    }
 
-  document.head.appendChild(youtubeApiScript);
-
-  // Observa quando o vídeo entra na área visível
-  const bpVideoObserver = new IntersectionObserver(
-    (entries) => {
-      const entry = entries[0];
-
-      /*
-       * Só inicia quando pelo menos 55% do vídeo
-       * estiver realmente aparecendo na tela.
-       */
-      bpVideoVisible = entry.isIntersecting && entry.intersectionRatio >= 0.55;
-
-      updateBpYoutubePlayback();
-    },
-    {
-      threshold: [0, 0.25, 0.55, 0.75, 1],
-    },
-  );
-
-  bpVideoObserver.observe(bpVideoSection);
-
-  // Chamado automaticamente pela API do YouTube
-  window.onYouTubeIframeAPIReady = function () {
-    bpYoutubePlayer = new YT.Player("bpYoutubeVideo", {
+    item.player = new YT.Player(item.iframe.id, {
       events: {
-        onReady: function () {
-          bpYoutubeReady = true;
+        onReady: (event) => {
+          item.player = event.target;
+          item.ready = true;
+          item.player.setVolume(100);
+          updateYoutubePlayback(item);
+        },
+        onStateChange: (event) => {
+          if (event.data !== YT.PlayerState.PLAYING) return;
 
-          // Prepara o vídeo mudo para autoplay
-          bpYoutubePlayer.unMute();
-
-          updateBpYoutubePlayback();
+          pauseAllYoutubePlayers(event.target);
+          videos.forEach((video) => {
+            if (!video.paused) video.pause();
+          });
         },
       },
     });
-  };
+  });
+}
+
+if (youtubeAutoplayItems.length && "IntersectionObserver" in window) {
+  const youtubeVideoObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const item = youtubeAutoplayItems.find(
+          (candidate) => candidate.container === entry.target,
+        );
+
+        if (!item) return;
+
+        item.visible = entry.isIntersecting && entry.intersectionRatio >= 0.55;
+        updateYoutubePlayback(item);
+      });
+    },
+    { threshold: [0, 0.25, 0.55, 0.75, 1] },
+  );
+
+  youtubeAutoplayItems.forEach((item) => {
+    youtubeVideoObserver.observe(item.container);
+  });
+
+  window.onYouTubeIframeAPIReady = initializeYoutubeAutoplayPlayers;
+
+  if (window.YT?.Player) {
+    initializeYoutubeAutoplayPlayers();
+  } else if (
+    !document.querySelector('script[src="https://www.youtube.com/iframe_api"]')
+  ) {
+    const youtubeApiScript = document.createElement("script");
+    youtubeApiScript.src = "https://www.youtube.com/iframe_api";
+    youtubeApiScript.async = true;
+    document.head.appendChild(youtubeApiScript);
+  }
 }
 
 // -------------------------
@@ -630,7 +701,7 @@ function closeClientModal() {
 
   clientModal.classList.remove("is-open");
   clientModal.setAttribute("aria-hidden", "true");
-  document.body.classList.remove("client-modal-open");
+  syncModalBodyState();
 }
 
 function createClientWhatsAppLink(data) {
@@ -732,6 +803,145 @@ clientLeadForm?.addEventListener("submit", async (event) => {
     gtag("event", "clique_whatsapp_cliente", {
       event_category: "conversao",
       event_label: "cliente_igreen",
+    });
+  }
+
+  window.location.href = whatsappUrl;
+});
+
+// -------------------------
+// Eventos / popup de potenciais licenciados + WhatsApp
+// -------------------------
+const eventModal = document.getElementById("eventModal");
+const openEventModalBtn = document.getElementById("openEventModal");
+const eventLeadForm = document.getElementById("eventLeadForm");
+const eventCloseButtons = document.querySelectorAll("[data-event-close]");
+
+function syncModalBodyState() {
+  const hasOpenModal = Boolean(document.querySelector(".client-modal.is-open"));
+  document.body.classList.toggle("client-modal-open", hasOpenModal);
+}
+
+function openEventModal() {
+  if (!eventModal) return;
+
+  eventModal.classList.add("is-open");
+  eventModal.setAttribute("aria-hidden", "false");
+  syncModalBodyState();
+
+  if (typeof gtag === "function") {
+    gtag("event", "abrir_popup_evento", {
+      event_category: "lead",
+      event_label: "evento_licenciados",
+    });
+  }
+
+  window.setTimeout(() => {
+    document.getElementById("eventName")?.focus();
+  }, 150);
+}
+
+function closeEventModal() {
+  if (!eventModal) return;
+
+  eventModal.classList.remove("is-open");
+  eventModal.setAttribute("aria-hidden", "true");
+  syncModalBodyState();
+}
+
+function createEventWhatsAppLink(data) {
+  const message = [
+    "Olá! Vim pela seção de eventos da landing page e quero conhecer o próximo evento para potenciais Licenciados iGreen.",
+    "",
+    `Nome: ${data.name}`,
+    `WhatsApp: ${data.phone}`,
+    `E-mail: ${data.email}`,
+    `Cidade/UF: ${data.city}`,
+    `Perfil atual: ${data.profile}`,
+    `Interesse: ${data.interest}`,
+    "",
+    "Gostaria de falar com um atendente sobre os próximos eventos e a oportunidade de licenciamento.",
+  ].join("\n");
+
+  return `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
+}
+
+openEventModalBtn?.addEventListener("click", openEventModal);
+
+eventCloseButtons.forEach((button) => {
+  button.addEventListener("click", closeEventModal);
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && eventModal?.classList.contains("is-open")) {
+    closeEventModal();
+  }
+});
+
+eventLeadForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const name = document.getElementById("eventName")?.value.trim() || "";
+  const phone = document.getElementById("eventPhone")?.value.trim() || "";
+  const email = document.getElementById("eventEmail")?.value.trim() || "";
+  const city = document.getElementById("eventCity")?.value.trim() || "";
+  const profile = document.getElementById("eventProfile")?.value || "";
+  const interest = document.getElementById("eventInterest")?.value || "";
+  const consent = document.getElementById("eventConsent")?.checked;
+
+  if (!name || !phone || !email || !city || !profile || !interest || !consent) {
+    showToast("Preencha os campos obrigatórios para continuar.");
+    return;
+  }
+
+  const phoneDigits = phone.replace(/\D/g, "");
+
+  if (phoneDigits.length < 10 || phoneDigits.length > 13) {
+    showToast("Informe um WhatsApp válido.");
+    return;
+  }
+
+  const submitButton = eventLeadForm.querySelector('button[type="submit"]');
+
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = "ABRINDO WHATSAPP...";
+  }
+
+  const eventData = {
+    name,
+    phone,
+    email,
+    city,
+    profile,
+    interest,
+  };
+
+  const sheetLead = {
+    tipo: "licenciado",
+    lead_id: createLeadId(),
+    nome: name,
+    whatsapp: phone,
+    email,
+    cidade: city,
+    objetivo: interest,
+    tempo: "Captação pela seção de eventos",
+    perfil: profile,
+    momento: "Interessado em eventos e palestras",
+    score: 0,
+    rota_resultado: "Eventos / Palestras → WhatsApp",
+    ...getTrackingData(),
+  };
+
+  const whatsappUrl = createEventWhatsAppLink(eventData);
+
+  await saveLeadToSheet(sheetLead);
+
+  if (typeof gtag === "function") {
+    gtag("event", "clique_whatsapp_evento", {
+      event_category: "conversao",
+      event_label: "evento_licenciados",
+      event_interest: interest,
     });
   }
 
