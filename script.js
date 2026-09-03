@@ -484,13 +484,16 @@ videos.forEach((video) => {
     videos.forEach((other) => {
       if (other !== video && !other.paused) other.pause();
     });
-    pauseAllYoutubePlayers();
+    pauseAllYoutubePlayers(null, true);
   });
 });
 
 // -------------------------
 // Vídeos do YouTube / autoplay ao entrar na tela
 // -------------------------
+const YOUTUBE_AUTOPLAY_ENTER_RATIO = 0.65;
+const YOUTUBE_AUTOPLAY_EXIT_RATIO = 0.15;
+
 const youtubeAutoplayItems = [
   ...document.querySelectorAll("[data-youtube-autoplay]"),
 ]
@@ -505,21 +508,45 @@ const youtubeAutoplayItems = [
       player: null,
       ready: false,
       visible: false,
+      restartBlocked: false,
+      pauseRequestedAt: 0,
       soundEnabled: false,
       soundButton: null,
     };
   })
   .filter(Boolean);
 
-function pauseAllYoutubePlayers(exceptPlayer = null) {
+function setYoutubeRestartBlocked(item, blocked) {
+  item.restartBlocked = blocked;
+  item.container.classList.toggle("is-autoplay-blocked", blocked);
+}
+
+function pauseYoutubeItem(item, blockRestart = false) {
+  if (!item.ready || !item.player) return;
+
+  if (blockRestart && item.visible) {
+    setYoutubeRestartBlocked(item, true);
+  }
+
+  try {
+    const state = item.player.getPlayerState();
+    const canBePaused =
+      state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING;
+
+    if (!canBePaused) return;
+
+    item.pauseRequestedAt = Date.now();
+    item.player.pauseVideo();
+  } catch (error) {
+    item.pauseRequestedAt = 0;
+    console.warn("Não foi possível pausar um vídeo do YouTube.", error);
+  }
+}
+
+function pauseAllYoutubePlayers(exceptPlayer = null, blockRestart = false) {
   youtubeAutoplayItems.forEach((item) => {
     if (!item.ready || !item.player || item.player === exceptPlayer) return;
-
-    try {
-      item.player.pauseVideo();
-    } catch (error) {
-      console.warn("Não foi possível pausar um vídeo do YouTube.", error);
-    }
+    pauseYoutubeItem(item, blockRestart);
   });
 }
 
@@ -528,7 +555,9 @@ function updateYoutubePlayback(item) {
 
   try {
     if (item.visible) {
-      pauseAllYoutubePlayers(item.player);
+      if (item.restartBlocked) return;
+
+      pauseAllYoutubePlayers(item.player, true);
       videos.forEach((video) => {
         if (!video.paused) video.pause();
       });
@@ -546,7 +575,7 @@ function updateYoutubePlayback(item) {
       item.player.playVideo();
       item.soundButton?.classList.toggle("is-visible", !item.soundEnabled);
     } else {
-      item.player.pauseVideo();
+      pauseYoutubeItem(item);
       item.soundButton?.classList.remove("is-visible");
     }
   } catch (error) {
@@ -565,6 +594,8 @@ function initializeYoutubeAutoplayPlayers() {
       soundButton.addEventListener("click", () => {
         if (!item.ready || !item.player) return;
 
+        setYoutubeRestartBlocked(item, false);
+        item.pauseRequestedAt = 0;
         item.soundEnabled = true;
         item.player.unMute();
         item.player.setVolume(100);
@@ -584,9 +615,32 @@ function initializeYoutubeAutoplayPlayers() {
           updateYoutubePlayback(item);
         },
         onStateChange: (event) => {
+          if (event.data === YT.PlayerState.PAUSED) {
+            const programmaticPauseIsRecent =
+              item.pauseRequestedAt > 0 &&
+              Date.now() - item.pauseRequestedAt < 1500;
+
+            item.pauseRequestedAt = 0;
+
+            if (!programmaticPauseIsRecent && item.visible) {
+              setYoutubeRestartBlocked(item, true);
+            }
+            return;
+          }
+
           if (event.data !== YT.PlayerState.PLAYING) return;
 
-          pauseAllYoutubePlayers(event.target);
+          if (
+            item.pauseRequestedAt > 0 &&
+            Date.now() - item.pauseRequestedAt < 1500
+          ) {
+            item.player.pauseVideo();
+            return;
+          }
+
+          item.pauseRequestedAt = 0;
+          setYoutubeRestartBlocked(item, false);
+          pauseAllYoutubePlayers(event.target, true);
           videos.forEach((video) => {
             if (!video.paused) video.pause();
           });
@@ -606,11 +660,39 @@ if (youtubeAutoplayItems.length && "IntersectionObserver" in window) {
 
         if (!item) return;
 
-        item.visible = entry.isIntersecting && entry.intersectionRatio >= 0.55;
-        updateYoutubePlayback(item);
+        const wasVisible = item.visible;
+
+        if (
+          !item.visible &&
+          entry.isIntersecting &&
+          entry.intersectionRatio >= YOUTUBE_AUTOPLAY_ENTER_RATIO
+        ) {
+          item.visible = true;
+        } else if (
+          item.visible &&
+          (!entry.isIntersecting ||
+            entry.intersectionRatio <= YOUTUBE_AUTOPLAY_EXIT_RATIO)
+        ) {
+          item.visible = false;
+          setYoutubeRestartBlocked(item, false);
+        }
+
+        if (item.visible !== wasVisible) {
+          updateYoutubePlayback(item);
+        }
       });
     },
-    { threshold: [0, 0.25, 0.55, 0.75, 1] },
+    {
+      threshold: [
+        0,
+        YOUTUBE_AUTOPLAY_EXIT_RATIO,
+        0.25,
+        0.5,
+        YOUTUBE_AUTOPLAY_ENTER_RATIO,
+        0.75,
+        1,
+      ],
+    },
   );
 
   youtubeAutoplayItems.forEach((item) => {
