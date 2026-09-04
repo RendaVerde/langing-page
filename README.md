@@ -26,6 +26,10 @@ As configurações externas ficam concentradas no objeto `CONFIG`, no início de
 - número do atendimento por WhatsApp;
 - endpoint e identificador usados no envio para o Google Sheets.
 
+O Microsoft Clarity é carregado de forma assíncrona no `<head>` de `index.html`
+com o identificador público do projeto. Formulários e resultados personalizados
+utilizam `data-clarity-mask="true"` para reforçar a proteção dos dados dos leads.
+
 Os vídeos do YouTube dependem de `data-youtube-autoplay` no contêiner e de um
 `id` único no `iframe`. Os formulários dependem dos identificadores usados em
 `script.js`; por isso, qualquer alteração de `id` deve ser refletida nos dois

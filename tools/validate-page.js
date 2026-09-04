@@ -179,13 +179,56 @@ function validateJavaScriptSyntax() {
   } catch (error) {
     errors.push(`JavaScript inválido: ${error.message}`);
   }
+
+  const inlineScripts = collectMatches(
+    html,
+    /<script\b(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi,
+  ).filter((inlineScript) => inlineScript.trim());
+
+  inlineScripts.forEach((inlineScript, index) => {
+    try {
+      new vm.Script(inlineScript, { filename: `index.html:inline-${index + 1}` });
+    } catch (error) {
+      errors.push(`Script inline inválido: ${error.message}`);
+    }
+  });
+
+  return inlineScripts.length;
+}
+
+function validateClarityIntegration() {
+  const projectMatch = html.match(
+    /\(window,\s*document,\s*["']clarity["'],\s*["']script["'],\s*["']([a-z0-9]+)["']\s*\)/i,
+  );
+  const loadsOfficialScript = html.includes(
+    't.src = "https://www.clarity.ms/tag/" + i;',
+  );
+  const maskedElements = collectMatches(
+    html,
+    /<[^>]+\bdata-clarity-mask=["']true["'][^>]*>/gi,
+    0,
+  );
+
+  if (!projectMatch || !loadsOfficialScript) {
+    errors.push("Integração do Microsoft Clarity ausente ou incompleta.");
+  }
+
+  if (maskedElements.length < 5) {
+    errors.push("Mascaramento explícito do Clarity incompleto.");
+  }
+
+  return {
+    projectId: projectMatch?.[1] || "não encontrado",
+    maskedElements: maskedElements.length,
+  };
 }
 
 const localReferences = validateLocalReferences();
 const idSummary = validateIds();
 const htmlTokens = validateHtmlStructure();
 validateCssBlocks();
-validateJavaScriptSyntax();
+const inlineScripts = validateJavaScriptSyntax();
+const claritySummary = validateClarityIntegration();
 
 if (errors.length) {
   console.error("Validação reprovada:\n");
@@ -199,3 +242,7 @@ console.log(`- ${idSummary.ids} IDs únicos verificados`);
 console.log(`- ${idSummary.labels} associações de formulário verificadas`);
 console.log(`- ${idSummary.scriptIds} referências do JavaScript verificadas`);
 console.log(`- ${localReferences} arquivos locais encontrados`);
+console.log(`- ${inlineScripts} scripts inline verificados`);
+console.log(
+  `- Clarity ${claritySummary.projectId} com ${claritySummary.maskedElements} áreas protegidas`,
+);
