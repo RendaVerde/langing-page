@@ -1,0 +1,201 @@
+const fs = require("node:fs");
+const path = require("node:path");
+const vm = require("node:vm");
+
+const projectRoot = path.resolve(__dirname, "..");
+const htmlPath = path.join(projectRoot, "index.html");
+const cssPath = path.join(projectRoot, "style.css");
+const scriptPath = path.join(projectRoot, "script.js");
+
+const html = fs.readFileSync(htmlPath, "utf8");
+const css = fs.readFileSync(cssPath, "utf8");
+const script = fs.readFileSync(scriptPath, "utf8");
+
+const errors = [];
+
+function unique(values) {
+  return [...new Set(values)];
+}
+
+function collectMatches(source, pattern, group = 1) {
+  return [...source.matchAll(pattern)].map((match) => match[group]);
+}
+
+function validateLocalReferences() {
+  const references = collectMatches(
+    html,
+    /\b(?:href|poster|src)=["'](\.\/[^"']+)["']/g,
+  ).map((reference) =>
+    decodeURIComponent(reference.slice(2).split(/[?#]/, 1)[0]),
+  );
+
+  const missingReferences = unique(references).filter(
+    (reference) => !fs.existsSync(path.join(projectRoot, reference)),
+  );
+
+  if (missingReferences.length) {
+    errors.push(`Arquivos locais ausentes: ${missingReferences.join(", ")}`);
+  }
+
+  return unique(references).length;
+}
+
+function validateIds() {
+  const ids = collectMatches(html, /\bid=["']([^"']+)["']/g);
+  const duplicateIds = unique(
+    ids.filter((id, index) => ids.indexOf(id) !== index),
+  );
+
+  if (duplicateIds.length) {
+    errors.push(`IDs duplicados: ${duplicateIds.join(", ")}`);
+  }
+
+  const labelTargets = collectMatches(
+    html,
+    /<label\b[^>]*\bfor=["']([^"']+)["']/g,
+  );
+  const missingLabelTargets = unique(labelTargets).filter(
+    (target) => !ids.includes(target),
+  );
+
+  if (missingLabelTargets.length) {
+    errors.push(
+      `Campos referenciados por label não encontrados: ${missingLabelTargets.join(", ")}`,
+    );
+  }
+
+  const scriptIds = collectMatches(
+    script,
+    /getElementById\(["']([^"']+)["']\)/g,
+  );
+  const missingScriptIds = unique(scriptIds).filter((id) => !ids.includes(id));
+
+  if (missingScriptIds.length) {
+    errors.push(
+      `IDs usados no JavaScript não encontrados: ${missingScriptIds.join(", ")}`,
+    );
+  }
+
+  return { ids: ids.length, labels: labelTargets.length, scriptIds: scriptIds.length };
+}
+
+function validateHtmlStructure() {
+  const voidElements = new Set([
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
+  ]);
+  const stack = [];
+  const tokens = html.match(/<!--[\s\S]*?-->|<![^>]*>|<\/?[a-z][^>]*>/gi) || [];
+
+  tokens.forEach((token) => {
+    if (token.startsWith("<!--") || token.startsWith("<!")) return;
+
+    const match = token.match(/^<\/?\s*([a-z][\w:-]*)/i);
+    if (!match) return;
+
+    const tag = match[1].toLowerCase();
+    const isClosingTag = /^<\//.test(token);
+    const isSelfClosingTag = /\/>$/.test(token) || voidElements.has(tag);
+
+    if (isClosingTag) {
+      const expectedTag = stack.pop();
+      if (expectedTag !== tag) {
+        errors.push(
+          `Fechamento HTML inesperado: </${tag}>; esperado: </${expectedTag || "nenhum"}>.`,
+        );
+      }
+    } else if (!isSelfClosingTag) {
+      stack.push(tag);
+    }
+  });
+
+  if (stack.length) {
+    errors.push(`Tags HTML sem fechamento: ${stack.join(", ")}`);
+  }
+
+  return tokens.length;
+}
+
+function validateCssBlocks() {
+  let blockDepth = 0;
+  let state = "code";
+  let quote = "";
+
+  for (let index = 0; index < css.length; index += 1) {
+    const character = css[index];
+    const nextCharacter = css[index + 1];
+
+    if (state === "comment") {
+      if (character === "*" && nextCharacter === "/") {
+        state = "code";
+        index += 1;
+      }
+      continue;
+    }
+
+    if (state === "string") {
+      if (character === "\\") {
+        index += 1;
+      } else if (character === quote) {
+        state = "code";
+      }
+      continue;
+    }
+
+    if (character === "/" && nextCharacter === "*") {
+      state = "comment";
+      index += 1;
+    } else if (character === '"' || character === "'") {
+      state = "string";
+      quote = character;
+    } else if (character === "{") {
+      blockDepth += 1;
+    } else if (character === "}") {
+      blockDepth -= 1;
+      if (blockDepth < 0) break;
+    }
+  }
+
+  if (state === "comment") errors.push("Comentário CSS sem fechamento.");
+  if (state === "string") errors.push("String CSS sem fechamento.");
+  if (blockDepth !== 0) errors.push(`Blocos CSS desequilibrados: ${blockDepth}.`);
+}
+
+function validateJavaScriptSyntax() {
+  try {
+    new vm.Script(script, { filename: "script.js" });
+  } catch (error) {
+    errors.push(`JavaScript inválido: ${error.message}`);
+  }
+}
+
+const localReferences = validateLocalReferences();
+const idSummary = validateIds();
+const htmlTokens = validateHtmlStructure();
+validateCssBlocks();
+validateJavaScriptSyntax();
+
+if (errors.length) {
+  console.error("Validação reprovada:\n");
+  errors.forEach((error) => console.error(`- ${error}`));
+  process.exit(1);
+}
+
+console.log("Validação concluída sem erros.");
+console.log(`- ${htmlTokens} elementos HTML analisados`);
+console.log(`- ${idSummary.ids} IDs únicos verificados`);
+console.log(`- ${idSummary.labels} associações de formulário verificadas`);
+console.log(`- ${idSummary.scriptIds} referências do JavaScript verificadas`);
+console.log(`- ${localReferences} arquivos locais encontrados`);

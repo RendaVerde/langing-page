@@ -1,3 +1,19 @@
+/* ==========================================================================
+   LANDING PAGE IGREEN ENERGY — COMPORTAMENTOS
+
+   Organização do arquivo:
+   01. Configuração
+   02. Quiz e roteamento do lead
+   03. Prova social e lightbox
+   04. Reprodução de vídeos locais e YouTube
+   05. Controles globais da interface
+   06. Formulários de cliente e eventos
+   07. Cards expansíveis do ecossistema
+   08. Persistência dos leads no Google Sheets
+   ========================================================================== */
+
+// 01 · Configuração
+// -----------------------------------------------------------------------------
 const CONFIG = {
   checkoutUrl: "https://expansao.igreenenergy.com.br/?id=29284&checkout=true",
   whatsappNumber: "5527988021747",
@@ -6,9 +22,8 @@ const CONFIG = {
   sheetSiteId: "rendaverde-igreen",
 };
 
-// -------------------------
-// Quiz / qualificação
-// -------------------------
+// 02 · Quiz e qualificação
+// -----------------------------------------------------------------------------
 const answers = {};
 let step = 1;
 const qs = [...document.querySelectorAll(".q")];
@@ -155,19 +170,14 @@ async function submitLead() {
     created_at: new Date().toISOString(),
   };
 
-  /*
-   * VALIDAÇÃO
-   */
+  // Validação dos campos obrigatórios.
   if (!lead.nome || !lead.whatsapp || !lead.cidade || !lead.momento) {
     showToast("Preencha nome, WhatsApp, cidade e momento.");
 
     return;
   }
 
-  /*
-   * DEFINE O CAMINHO DO LEAD
-   */
-
+  // Define o caminho de conversão conforme o momento informado.
   const wantsMoreInformation =
     lead.momento === "Quero conhecer antes de decidir";
 
@@ -195,20 +205,11 @@ async function submitLead() {
 
   lead.destination = wantsMoreInformation ? "whatsapp" : "activation";
 
-  /*
-   * TELAS DE RESULTADO
-   */
-
+  // Referências das duas telas possíveis de resultado.
   const whatsappPath = document.getElementById("whatsappPath");
-
   const activationPath = document.getElementById("activationPath");
 
-  /*
-   * =========================================
-   * CAMINHO WHATSAPP
-   * =========================================
-   */
-
+  // Caminho 1: atendimento consultivo pelo WhatsApp.
   if (wantsMoreInformation) {
     if (whatsappPath) whatsappPath.hidden = false;
 
@@ -226,11 +227,7 @@ async function submitLead() {
       whatsappBtn.href = createWhatsAppLink(lead);
     }
   } else {
-    /*
-     * =========================================
-     * CAMINHO ATIVAÇÃO
-     * =========================================
-     */
+    // Caminho 2: ativação da licença ou atendimento antes da compra.
     if (whatsappPath) whatsappPath.hidden = true;
     if (activationPath) activationPath.hidden = false;
 
@@ -257,10 +254,6 @@ async function submitLead() {
       activationWhatsappBtn.href = createWhatsAppLink(lead);
     }
 
-    if (activationWhatsappBtn) {
-      activationWhatsappBtn.href = createWhatsAppLink(lead);
-    }
-
     if (resultTitle) {
       resultTitle.textContent =
         score >= 5
@@ -275,10 +268,7 @@ async function submitLead() {
     }
   }
 
-  /*
-   * EXIBE RESULTADO
-   */
-
+  // Exibe o resultado selecionado.
   step = 5;
 
   renderQuiz();
@@ -287,9 +277,8 @@ async function submitLead() {
 if (nextBtn) nextBtn.addEventListener("click", submitLead);
 renderQuiz();
 
-// -------------------------
-// Prova social / carrossel + filtros
-// -------------------------
+// 03 · Prova social: carrossel e filtros
+// -----------------------------------------------------------------------------
 const proofSlider = document.getElementById("proofSlider");
 const proofSlides = [...document.querySelectorAll(".proof-slide")];
 const proofPrev = document.getElementById("proofPrev");
@@ -420,9 +409,8 @@ if ("IntersectionObserver" in window && proofSlider) {
 updateProof(0);
 startProofAutoplay();
 
-// -------------------------
-// Lightbox das provas
-// -------------------------
+// 03.1 · Lightbox das provas
+// -----------------------------------------------------------------------------
 const lightbox = document.getElementById("lightbox");
 const lightboxImage = document.getElementById("lightboxImage");
 const lightboxClose = document.getElementById("lightboxClose");
@@ -477,7 +465,10 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-// Evita múltiplos vídeos tocando ao mesmo tempo
+// 04 · Reprodução de vídeos
+// -----------------------------------------------------------------------------
+
+// Evita múltiplos vídeos tocando ao mesmo tempo.
 const videos = [...document.querySelectorAll("video")];
 videos.forEach((video) => {
   video.addEventListener("play", () => {
@@ -488,9 +479,8 @@ videos.forEach((video) => {
   });
 });
 
-// -------------------------
-// Vídeos do YouTube / autoplay ao entrar na tela
-// -------------------------
+// 04.1 · YouTube: autoplay ao entrar na tela
+// -----------------------------------------------------------------------------
 const YOUTUBE_AUTOPLAY_ENTER_RATIO = 0.65;
 const YOUTUBE_AUTOPLAY_EXIT_RATIO = 0.15;
 
@@ -713,37 +703,27 @@ if (youtubeAutoplayItems.length && "IntersectionObserver" in window) {
   }
 }
 
-// -------------------------
-// Botão voltar ao topo
-// -------------------------
+// 05 · Controles globais: botão voltar ao topo
+// -----------------------------------------------------------------------------
 
 const backToTop = document.getElementById("backToTop");
 
 function updateBackToTop() {
   if (!backToTop) return;
 
-  /*
-   * O botão só aparece depois que
-   * o visitante se afastou do início.
-   */
+  // O botão só aparece depois que o visitante se afasta do início.
   const shouldShow = window.scrollY > 500;
 
   backToTop.classList.toggle("is-visible", shouldShow);
 }
 
 if (backToTop) {
-  /*
-   * Controla a exibição conforme
-   * a rolagem da página.
-   */
+  // Controla a exibição conforme a rolagem da página.
   window.addEventListener("scroll", updateBackToTop, {
     passive: true,
   });
 
-  /*
-   * Clique → volta suavemente
-   * para o início.
-   */
+  // Clique: volta suavemente para o início.
   backToTop.addEventListener("click", () => {
     window.scrollTo({
       top: 0,
@@ -751,16 +731,12 @@ if (backToTop) {
     });
   });
 
-  /*
-   * Define o estado correto
-   * assim que a página carregar.
-   */
+  // Define o estado correto assim que a página carrega.
   updateBackToTop();
 }
 
-// -------------------------
-// Cliente iGreen / popup + WhatsApp
-// -------------------------
+// 06 · Formulário de potenciais clientes e WhatsApp
+// -----------------------------------------------------------------------------
 const clientModal = document.getElementById("clientModal");
 const openClientModalBtn = document.getElementById("openClientModal");
 const clientLeadForm = document.getElementById("clientLeadForm");
@@ -891,9 +867,8 @@ clientLeadForm?.addEventListener("submit", async (event) => {
   window.location.href = whatsappUrl;
 });
 
-// -------------------------
-// Eventos / popup de potenciais licenciados + WhatsApp
-// -------------------------
+// 06.1 · Formulário de eventos e potenciais licenciados
+// -----------------------------------------------------------------------------
 const eventModal = document.getElementById("eventModal");
 const openEventModalBtn = document.getElementById("openEventModal");
 const eventLeadForm = document.getElementById("eventLeadForm");
@@ -1030,6 +1005,8 @@ eventLeadForm?.addEventListener("submit", async (event) => {
   window.location.href = whatsappUrl;
 });
 
+// 07 · Cards expansíveis do ecossistema no mobile
+// -----------------------------------------------------------------------------
 const ecoCards = document.querySelectorAll("[data-eco]");
 const mobileQuery = window.matchMedia("(max-width: 620px)");
 
@@ -1089,9 +1066,8 @@ if (mobileQuery.addEventListener) {
   mobileQuery.addListener(resetEcoStateOnDesktop);
 }
 
-// -------------------------
-// Google Sheets / Leads
-// -------------------------
+// 08 · Persistência dos leads no Google Sheets
+// -----------------------------------------------------------------------------
 
 function createLeadId() {
   if (window.crypto?.randomUUID) {
@@ -1129,10 +1105,7 @@ async function saveLeadToSheet(data) {
   const formData = new URLSearchParams();
   formData.set("payload", JSON.stringify(payload));
 
-  /*
-   * sendBeacon é ideal para este caso porque
-   * a página pode redirecionar logo depois.
-   */
+  // sendBeacon preserva o envio mesmo quando a página redireciona em seguida.
   if (navigator.sendBeacon) {
     const queued = navigator.sendBeacon(CONFIG.sheetEndpoint, formData);
 
@@ -1141,10 +1114,7 @@ async function saveLeadToSheet(data) {
     }
   }
 
-  /*
-   * Fallback para navegadores onde Beacon
-   * não conseguiu enfileirar a requisição.
-   */
+  // Fallback para navegadores que não conseguiram enfileirar o Beacon.
   try {
     await fetch(CONFIG.sheetEndpoint, {
       method: "POST",
