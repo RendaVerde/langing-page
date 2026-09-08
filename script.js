@@ -22,6 +22,66 @@ const CONFIG = {
   sheetSiteId: "rendaverde-igreen",
 };
 
+function trackConversionEvent(name, params = {}) {
+  if (typeof window.clarity === "function") {
+    window.clarity("event", name);
+  }
+
+  if (typeof window.gtag === "function") {
+    window.gtag("event", name, {
+      event_category: "conversao",
+      ...params,
+    });
+  }
+}
+
+function getCtaLocation(element) {
+  if (element.closest(".hero")) return "hero";
+  if (element.closest(".decision-section")) return "resumo_essencial";
+  if (element.closest(".price-panel")) return "investimento";
+  if (element.closest(".closing")) return "fechamento";
+  if (element.closest(".mobile-bar")) return "barra_mobile";
+  if (element.closest(".nav")) return "navegacao";
+  return "pagina";
+}
+
+// Reordena os dois blocos mais decisivos antes da primeira pintura útil.
+// Sem JavaScript, a ordem original continua funcional como fallback.
+const decisionSection = document.getElementById("essencial");
+const quizSection = document.getElementById("avaliacao");
+const eventSection = document.getElementById("eventos");
+const faqSection = document.querySelector(".faq-section");
+
+if (decisionSection && quizSection) {
+  decisionSection.insertAdjacentElement("afterend", quizSection);
+}
+
+if (eventSection && faqSection) {
+  faqSection.insertAdjacentElement("beforebegin", eventSection);
+}
+
+document.querySelectorAll('a[href="#avaliacao"]').forEach((cta) => {
+  cta.addEventListener("click", () => {
+    trackConversionEvent("cta_avaliacao_click", {
+      cta_location: getCtaLocation(cta),
+    });
+  });
+});
+
+document
+  .querySelector('.decision-client-link[href="#cliente-igreen"]')
+  ?.addEventListener("click", () => {
+    trackConversionEvent("cta_cliente_gratuito_click", {
+      cta_location: "resumo_essencial",
+    });
+  });
+
+if (typeof window.clarity === "function") {
+  window.clarity("set", "landing_version", "decision_first_v1");
+  const source = new URLSearchParams(window.location.search).get("utm_source");
+  if (source) window.clarity("set", "utm_source", source);
+}
+
 // 02 · Quiz e qualificação
 // -----------------------------------------------------------------------------
 const answers = {};
@@ -32,6 +92,7 @@ const label = document.getElementById("stepLabel");
 const backBtn = document.getElementById("backBtn");
 const nextBtn = document.getElementById("nextBtn");
 const toast = document.getElementById("toast");
+const trackedQuizViews = new Set();
 
 function showToast(msg) {
   if (!toast) return;
@@ -45,21 +106,39 @@ function renderQuiz() {
     q.classList.toggle("active", Number(q.dataset.step) === step),
   );
   if (bar) bar.style.width = Math.min(100, (step / 4) * 100) + "%";
-  if (label)
-    label.textContent = step <= 4 ? `PERGUNTA ${step} DE 4` : "RESULTADO";
+  if (label) {
+    label.textContent =
+      step < 4
+        ? `PERGUNTA ${step} DE 4`
+        : step === 4
+          ? "DADOS · ETAPA 4 DE 4"
+          : "RESULTADO";
+  }
   if (backBtn)
     backBtn.style.visibility = step > 1 && step < 5 ? "visible" : "hidden";
   if (nextBtn) nextBtn.style.display = step === 4 ? "inline-flex" : "none";
+
+  if (step > 1 && step <= 4 && !trackedQuizViews.has(step)) {
+    trackedQuizViews.add(step);
+    trackConversionEvent(`quiz_etapa_${step}_visualizada`);
+  }
 }
 
 document.querySelectorAll(".opt").forEach((btn) => {
   btn.addEventListener("click", () => {
+    const completedStep = step;
     const key = btn.dataset.key;
+    if (completedStep === 1) {
+      trackConversionEvent("quiz_iniciado");
+    }
     answers[key] = btn.dataset.value;
     btn.parentElement
       .querySelectorAll(".opt")
       .forEach((x) => x.classList.remove("selected"));
     btn.classList.add("selected");
+    trackConversionEvent(`quiz_etapa_${completedStep}_concluida`, {
+      answer_key: key,
+    });
     window.setTimeout(() => {
       step++;
       renderQuiz();
@@ -150,6 +229,8 @@ async function submitLead() {
 
   const score = scoreProfile();
 
+  const selectedMoment = momento?.value || "Quero conhecer antes de decidir";
+
   const lead = {
     ...answers,
 
@@ -157,7 +238,7 @@ async function submitLead() {
     whatsapp: whats?.value.trim() || "",
     cidade: cidade?.value.trim() || "",
     email: email?.value.trim() || "",
-    momento: momento?.value || "",
+    momento: selectedMoment,
     score: score,
     quiz_completed: true,
     page: window.location.href,
@@ -170,11 +251,26 @@ async function submitLead() {
     created_at: new Date().toISOString(),
   };
 
-  // Validação dos campos obrigatórios.
-  if (!lead.nome || !lead.whatsapp || !lead.cidade || !lead.momento) {
-    showToast("Preencha nome, WhatsApp, cidade e momento.");
+  trackConversionEvent("lead_envio_tentado", { lead_type: "licenciado" });
+
+  // Mantém somente os dados indispensáveis como obrigatórios.
+  if (!lead.nome || !lead.whatsapp || !lead.cidade) {
+    showToast("Preencha nome, WhatsApp e cidade.");
 
     return;
+  }
+
+  const phoneDigits = lead.whatsapp.replace(/\D/g, "");
+
+  if (phoneDigits.length < 10 || phoneDigits.length > 13) {
+    showToast("Informe um WhatsApp válido.");
+
+    return;
+  }
+
+  if (nextBtn) {
+    nextBtn.disabled = true;
+    nextBtn.textContent = "ENVIANDO...";
   }
 
   // Define o caminho de conversão conforme o momento informado.
@@ -201,7 +297,19 @@ async function submitLead() {
     ...getTrackingData(),
   };
 
-  await saveLeadToSheet(licensedLead);
+  const leadSaved = await saveLeadToSheet(licensedLead);
+
+  if (leadSaved) {
+    trackConversionEvent("lead_salvo", {
+      lead_type: "licenciado",
+      lead_route: licensedLead.rota_resultado,
+    });
+  } else {
+    trackConversionEvent("lead_salvamento_falhou", {
+      lead_type: "licenciado",
+    });
+    showToast("Siga pelo WhatsApp para concluir seu atendimento.");
+  }
 
   lead.destination = wantsMoreInformation ? "whatsapp" : "activation";
 
@@ -241,13 +349,10 @@ async function submitLead() {
     if (checkoutBtn) {
       checkoutBtn.href = CONFIG.checkoutUrl;
 
-      checkoutBtn.onclick = () => {
-        if (typeof gtag === "function") {
-          gtag("event", "clique_ativar_licenca", {
-            event_category: "conversao",
-          });
-        }
-      };
+      checkoutBtn.onclick = () =>
+        trackConversionEvent("checkout_aberto", {
+          lead_type: "licenciado",
+        });
     }
 
     if (activationWhatsappBtn) {
@@ -272,9 +377,31 @@ async function submitLead() {
   step = 5;
 
   renderQuiz();
+
+  if (nextBtn) {
+    nextBtn.disabled = false;
+    nextBtn.textContent = "CONTINUAR →";
+  }
 }
 
 if (nextBtn) nextBtn.addEventListener("click", submitLead);
+
+document.getElementById("whatsappBtn")?.addEventListener("click", () => {
+  trackConversionEvent("whatsapp_aberto", {
+    lead_type: "licenciado",
+    lead_route: "consultivo",
+  });
+});
+
+document
+  .getElementById("activationWhatsappBtn")
+  ?.addEventListener("click", () => {
+    trackConversionEvent("whatsapp_aberto", {
+      lead_type: "licenciado",
+      lead_route: "ativacao",
+    });
+  });
+
 renderQuiz();
 
 // 03 · Prova social: carrossel e filtros
@@ -438,8 +565,18 @@ function closeLightbox() {
 document.querySelectorAll(".proof-image-button").forEach((button) => {
   button.addEventListener("click", () => {
     const img = button.querySelector("img");
-    if (img) openLightbox(img, button);
+    if (img) {
+      trackConversionEvent("prova_social_ampliada", {
+        proof_category: button.closest(".proof-slide")?.dataset.category || "",
+      });
+      openLightbox(img, button);
+    }
   });
+});
+
+const proofOpenCase = document.getElementById("proofOpenCase");
+proofOpenCase?.addEventListener("click", () => {
+  visibleProofSlides[proofIndex]?.querySelector(".proof-image-button")?.click();
 });
 
 lightboxClose?.addEventListener("click", closeLightbox);
@@ -465,6 +602,18 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+const revealVideos = document.getElementById("revealVideos");
+const videoProofSection = document.querySelector(".video-proof-section");
+
+revealVideos?.addEventListener("click", () => {
+  const expanded = videoProofSection?.classList.toggle("is-expanded") || false;
+  revealVideos.setAttribute("aria-expanded", String(expanded));
+  revealVideos.textContent = expanded
+    ? "MOSTRAR MENOS HISTÓRIAS ↑"
+    : "VER MAIS HISTÓRIAS ↓";
+  if (expanded) trackConversionEvent("depoimentos_expandidos");
+});
+
 // 04 · Reprodução de vídeos
 // -----------------------------------------------------------------------------
 
@@ -481,8 +630,8 @@ videos.forEach((video) => {
 
 // 04.1 · YouTube: autoplay ao entrar na tela
 // -----------------------------------------------------------------------------
-const YOUTUBE_AUTOPLAY_ENTER_RATIO = 0.65;
-const YOUTUBE_AUTOPLAY_EXIT_RATIO = 0.15;
+const YOUTUBE_AUTOPLAY_ENTER_RATIO = 0.4;
+const YOUTUBE_AUTOPLAY_EXIT_RATIO = 0.08;
 
 const youtubeAutoplayItems = [
   ...document.querySelectorAll("[data-youtube-autoplay]"),
@@ -519,12 +668,8 @@ function pauseYoutubeItem(item, blockRestart = false) {
   }
 
   try {
-    const state = item.player.getPlayerState();
-    const canBePaused =
-      state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING;
-
-    if (!canBePaused) return;
-
+    // Envia a pausa mesmo durante UNSTARTED/CUED. Isso evita que um playVideo
+    // já enfileirado comece depois que o visitante saiu da seção.
     item.pauseRequestedAt = Date.now();
     item.player.pauseVideo();
   } catch (error) {
@@ -562,6 +707,7 @@ function updateYoutubePlayback(item) {
       } else {
         item.player.mute();
       }
+      item.pauseRequestedAt = 0;
       item.player.playVideo();
       item.soundButton?.classList.toggle("is-visible", !item.soundEnabled);
     } else {
@@ -619,6 +765,14 @@ function initializeYoutubeAutoplayPlayers() {
           }
 
           if (event.data !== YT.PlayerState.PLAYING) return;
+
+          // O player pode confirmar o PLAYING depois que a seção já saiu da
+          // tela. Nesse caso, a pausa precisa vencer a reprodução pendente.
+          if (!item.visible || document.hidden) {
+            item.pauseRequestedAt = Date.now();
+            item.player.pauseVideo();
+            return;
+          }
 
           if (
             item.pauseRequestedAt > 0 &&
@@ -691,6 +845,8 @@ if (youtubeAutoplayItems.length && "IntersectionObserver" in window) {
 
   window.onYouTubeIframeAPIReady = initializeYoutubeAutoplayPlayers;
 
+  // Prepara todos os players desde o carregamento. Os iframes continuam lazy,
+  // mas o controlador já está disponível quando cada vídeo entra na tela.
   if (window.YT?.Player) {
     initializeYoutubeAutoplayPlayers();
   } else if (
@@ -701,12 +857,95 @@ if (youtubeAutoplayItems.length && "IntersectionObserver" in window) {
     youtubeApiScript.async = true;
     document.head.appendChild(youtubeApiScript);
   }
+} else if (youtubeAutoplayItems.length) {
+  window.onYouTubeIframeAPIReady = initializeYoutubeAutoplayPlayers;
+  const youtubeApiScript = document.createElement("script");
+  youtubeApiScript.src = "https://www.youtube.com/iframe_api";
+  youtubeApiScript.async = true;
+  document.head.appendChild(youtubeApiScript);
 }
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    pauseAllYoutubePlayers();
+    return;
+  }
+
+  youtubeAutoplayItems.forEach((item) => updateYoutubePlayback(item));
+});
 
 // 05 · Controles globais: botão voltar ao topo
 // -----------------------------------------------------------------------------
 
 const backToTop = document.getElementById("backToTop");
+const mobileBar = document.querySelector(".mobile-bar");
+const heroPrimaryCta = document.querySelector('.hero a[href="#avaliacao"]');
+let heroCtaVisible = true;
+let quizVisible = false;
+
+function syncMobileBar() {
+  if (!mobileBar) return;
+
+  const shouldShow =
+    window.matchMedia("(max-width: 620px)").matches &&
+    !heroCtaVisible &&
+    !quizVisible;
+
+  mobileBar.classList.toggle("is-visible", shouldShow);
+  mobileBar.setAttribute("aria-hidden", String(!shouldShow));
+  mobileBar.toggleAttribute("inert", !shouldShow);
+  document.body.classList.toggle("mobile-cta-visible", shouldShow);
+}
+
+if ("IntersectionObserver" in window && mobileBar) {
+  const mobileBarObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.target === heroPrimaryCta) {
+          heroCtaVisible = entry.isIntersecting;
+        }
+        if (entry.target === quizSection) {
+          quizVisible = entry.isIntersecting;
+          if (quizVisible && !trackedQuizViews.has(1)) {
+            trackedQuizViews.add(1);
+            trackConversionEvent("quiz_etapa_1_visualizada");
+          }
+        }
+      });
+      syncMobileBar();
+    },
+    { threshold: 0.05 },
+  );
+
+  if (heroPrimaryCta) mobileBarObserver.observe(heroPrimaryCta);
+  if (quizSection) mobileBarObserver.observe(quizSection);
+} else if (mobileBar) {
+  const updateMobileBarFallback = () => {
+    const viewportHeight = window.innerHeight;
+    const heroRect = heroPrimaryCta?.getBoundingClientRect();
+    const quizRect = quizSection?.getBoundingClientRect();
+
+    heroCtaVisible = Boolean(
+      heroRect && heroRect.bottom > 0 && heroRect.top < viewportHeight,
+    );
+    quizVisible = Boolean(
+      quizRect && quizRect.bottom > 0 && quizRect.top < viewportHeight,
+    );
+    if (quizVisible && !trackedQuizViews.has(1)) {
+      trackedQuizViews.add(1);
+      trackConversionEvent("quiz_etapa_1_visualizada");
+    }
+    syncMobileBar();
+  };
+
+  window.addEventListener("scroll", updateMobileBarFallback, {
+    passive: true,
+  });
+  updateMobileBarFallback();
+}
+
+window.addEventListener("resize", syncMobileBar);
+syncMobileBar();
 
 function updateBackToTop() {
   if (!backToTop) return;
@@ -744,6 +983,10 @@ const clientCloseButtons = document.querySelectorAll("[data-client-close]");
 
 function openClientModal() {
   if (!clientModal) return;
+
+  trackConversionEvent("formulario_cliente_aberto", {
+    lead_type: "cliente",
+  });
 
   clientModal.classList.add("is-open");
   clientModal.setAttribute("aria-hidden", "false");
@@ -801,6 +1044,8 @@ document.addEventListener("keydown", (event) => {
 clientLeadForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
+  trackConversionEvent("lead_envio_tentado", { lead_type: "cliente" });
+
   const name = document.getElementById("clientName")?.value.trim() || "";
   const phone = document.getElementById("clientPhone")?.value.trim() || "";
   const email = document.getElementById("clientEmail")?.value.trim() || "";
@@ -855,14 +1100,15 @@ clientLeadForm?.addEventListener("submit", async (event) => {
 
   const whatsappUrl = createClientWhatsAppLink(clientData);
 
-  await saveLeadToSheet(sheetLead);
+  const leadSaved = await saveLeadToSheet(sheetLead);
 
-  if (typeof gtag === "function") {
-    gtag("event", "clique_whatsapp_cliente", {
-      event_category: "conversao",
-      event_label: "cliente_igreen",
-    });
+  if (leadSaved) {
+    trackConversionEvent("lead_salvo", { lead_type: "cliente" });
+  } else {
+    trackConversionEvent("lead_salvamento_falhou", { lead_type: "cliente" });
   }
+
+  trackConversionEvent("whatsapp_aberto", { lead_type: "cliente" });
 
   window.location.href = whatsappUrl;
 });
@@ -886,12 +1132,9 @@ function openEventModal() {
   eventModal.setAttribute("aria-hidden", "false");
   syncModalBodyState();
 
-  if (typeof gtag === "function") {
-    gtag("event", "abrir_popup_evento", {
-      event_category: "lead",
-      event_label: "evento_licenciados",
-    });
-  }
+  trackConversionEvent("formulario_evento_aberto", {
+    lead_type: "evento",
+  });
 
   window.setTimeout(() => {
     document.getElementById("eventName")?.focus();
@@ -937,6 +1180,8 @@ document.addEventListener("keydown", (event) => {
 
 eventLeadForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
+
+  trackConversionEvent("lead_envio_tentado", { lead_type: "evento" });
 
   const name = document.getElementById("eventName")?.value.trim() || "";
   const phone = document.getElementById("eventPhone")?.value.trim() || "";
@@ -992,15 +1237,18 @@ eventLeadForm?.addEventListener("submit", async (event) => {
 
   const whatsappUrl = createEventWhatsAppLink(eventData);
 
-  await saveLeadToSheet(sheetLead);
+  const leadSaved = await saveLeadToSheet(sheetLead);
 
-  if (typeof gtag === "function") {
-    gtag("event", "clique_whatsapp_evento", {
-      event_category: "conversao",
-      event_label: "evento_licenciados",
+  if (leadSaved) {
+    trackConversionEvent("lead_salvo", {
+      lead_type: "evento",
       event_interest: interest,
     });
+  } else {
+    trackConversionEvent("lead_salvamento_falhou", { lead_type: "evento" });
   }
+
+  trackConversionEvent("whatsapp_aberto", { lead_type: "evento" });
 
   window.location.href = whatsappUrl;
 });
