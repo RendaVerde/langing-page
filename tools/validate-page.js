@@ -223,12 +223,69 @@ function validateClarityIntegration() {
   };
 }
 
+function validatePortfolioSimulator() {
+  const requiredIds = [
+    "simulador-carteira",
+    "portfolioEnergyClients",
+    "portfolioInsuranceClients",
+    "portfolioTelecomClients",
+    "portfolioEstimate",
+    "portfolioSimulatorCta",
+  ];
+  const missingIds = requiredIds.filter(
+    (id) => !html.includes(`id="${id}"`),
+  );
+  const profileButtons = collectMatches(
+    html,
+    /\bdata-portfolio-profile=["']([^"']+)["']/g,
+  );
+  const portfolioFields = collectMatches(
+    html,
+    /\bdata-portfolio-field=["']([^"']+)["']/g,
+  );
+
+  if (missingIds.length) {
+    errors.push(
+      `Elementos do simulador ausentes: ${missingIds.join(", ")}`,
+    );
+  }
+
+  if (
+    !profileButtons.includes("licensee") ||
+    !profileButtons.includes("referrer")
+  ) {
+    errors.push("Perfis do simulador de carteira incompletos.");
+  }
+
+  if (
+    !["energy", "insurance", "telecom"].every((field) =>
+      portfolioFields.includes(field),
+    )
+  ) {
+    errors.push("Campos do simulador de carteira incompletos.");
+  }
+
+  if (
+    !script.includes(
+      'const portfolioSimulator = document.getElementById("simulador-carteira")',
+    )
+  ) {
+    errors.push("Comportamento do simulador de carteira não encontrado.");
+  }
+
+  return {
+    profiles: unique(profileButtons).length,
+    fields: unique(portfolioFields).length,
+  };
+}
+
 const localReferences = validateLocalReferences();
 const idSummary = validateIds();
 const htmlTokens = validateHtmlStructure();
 validateCssBlocks();
 const inlineScripts = validateJavaScriptSyntax();
 const claritySummary = validateClarityIntegration();
+const portfolioSummary = validatePortfolioSimulator();
 
 if (errors.length) {
   console.error("Validação reprovada:\n");
@@ -245,4 +302,7 @@ console.log(`- ${localReferences} arquivos locais encontrados`);
 console.log(`- ${inlineScripts} scripts inline verificados`);
 console.log(
   `- Clarity ${claritySummary.projectId} com ${claritySummary.maskedElements} áreas protegidas`,
+);
+console.log(
+  `- Simulador com ${portfolioSummary.profiles} perfis e ${portfolioSummary.fields} campos verificados`,
 );

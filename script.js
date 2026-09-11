@@ -404,6 +404,151 @@ document
 
 renderQuiz();
 
+// 02.1 · Simulador de carteira recorrente
+// -----------------------------------------------------------------------------
+const portfolioSimulator = document.getElementById("simulador-carteira");
+
+if (portfolioSimulator) {
+  const PORTFOLIO_PROFILES = {
+    licensee: {
+      energyRates: [0.02, 0.04],
+      energyLabel: "2%–4%",
+      energyNote: "Conforme categoria de bônus e contrato.",
+      telecomValue: 7,
+      telecomLabel: "R$ 7,00",
+      telecomNote: "Por conexão elegível e paga.",
+      insuranceRate: 0.05,
+      insuranceLabel: "5%",
+      insuranceNote: "Referência informada; confirme a regra vigente.",
+      profileNote:
+        "Valores de geração própria usados como referência. Confirme a categoria de bônus e as regras vigentes com o especialista.",
+      ctaLabel: "ANALISAR COM UM ESPECIALISTA →",
+    },
+    referrer: {
+      energyRates: [0.01, 0.02],
+      energyLabel: "1%–2%",
+      energyNote: "Referência do fluxo de indicação.",
+      telecomValue: 3.5,
+      telecomLabel: "R$ 3,50",
+      telecomNote: "Por indicação elegível e paga.",
+      insuranceRate: 0.025,
+      insuranceLabel: "2,5%",
+      insuranceNote: "Referência informada; confirme a regra vigente.",
+      profileNote:
+        "Valores de indicação usados como referência. Confirme as condições vigentes com o especialista antes de aderir.",
+      ctaLabel: "COMEÇAR GRATUITAMENTE →",
+    },
+  };
+  const currency = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+  const profileButtons = [
+    ...portfolioSimulator.querySelectorAll("[data-portfolio-profile]"),
+  ];
+  const clientFields = [
+    ...portfolioSimulator.querySelectorAll("[data-portfolio-field]"),
+  ];
+  const energyRate = document.getElementById("portfolioEnergyRate");
+  const energyNote = document.getElementById("portfolioEnergyNote");
+  const telecomRate = document.getElementById("portfolioTelecomRate");
+  const telecomNote = document.getElementById("portfolioTelecomNote");
+  const insuranceRate = document.getElementById("portfolioInsuranceRate");
+  const insuranceNote = document.getElementById("portfolioInsuranceNote");
+  const profileNote = document.getElementById("portfolioProfileNote");
+  const estimate = document.getElementById("portfolioEstimate");
+  const breakdown = document.getElementById("portfolioBreakdown");
+  const simulatorCta = document.getElementById("portfolioSimulatorCta");
+  let activeProfile = "licensee";
+  let simulatorTracked = false;
+
+  const formatCurrency = (value) => currency.format(value);
+  const formatRange = (minimum, maximum) =>
+    minimum === maximum
+      ? formatCurrency(minimum)
+      : `${formatCurrency(minimum)} a ${formatCurrency(maximum)}`;
+  const getClientCount = (fieldName) => {
+    const field = portfolioSimulator.querySelector(
+      `[data-portfolio-field="${fieldName}"]`,
+    );
+    const value = Number.parseInt(field?.value, 10);
+    return Number.isFinite(value) ? Math.min(1000, Math.max(0, value)) : 0;
+  };
+
+  function updatePortfolioSimulator() {
+    const profile = PORTFOLIO_PROFILES[activeProfile];
+    const energyClients = getClientCount("energy");
+    const insuranceClients = getClientCount("insurance");
+    const telecomClients = getClientCount("telecom");
+    const energyMinimum = energyClients * 500 * profile.energyRates[0];
+    const energyMaximum = energyClients * 500 * profile.energyRates[1];
+    const insuranceTotal = insuranceClients * 300 * profile.insuranceRate;
+    const telecomTotal = telecomClients * profile.telecomValue;
+    const totalMinimum = energyMinimum + insuranceTotal + telecomTotal;
+    const totalMaximum = energyMaximum + insuranceTotal + telecomTotal;
+
+    energyRate.textContent = profile.energyLabel;
+    energyNote.textContent = profile.energyNote;
+    telecomRate.textContent = profile.telecomLabel;
+    telecomNote.textContent = profile.telecomNote;
+    insuranceRate.textContent = profile.insuranceLabel;
+    insuranceNote.textContent = profile.insuranceNote;
+    profileNote.textContent = profile.profileNote;
+    estimate.textContent = formatRange(totalMinimum, totalMaximum);
+    breakdown.textContent = `Energia: ${formatRange(energyMinimum, energyMaximum)} · Seguros: ${formatCurrency(insuranceTotal)} · Telecom: ${formatCurrency(telecomTotal)}`;
+    simulatorCta.textContent = profile.ctaLabel;
+  }
+
+  profileButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      activeProfile = button.dataset.portfolioProfile;
+      profileButtons.forEach((item) => {
+        const selected = item === button;
+        item.classList.toggle("is-active", selected);
+        item.setAttribute("aria-pressed", String(selected));
+      });
+      updatePortfolioSimulator();
+      trackConversionEvent("simulador_carteira_perfil", {
+        simulator_profile: activeProfile,
+      });
+    });
+  });
+
+  clientFields.forEach((field) => {
+    field.addEventListener("input", () => {
+      updatePortfolioSimulator();
+      if (!simulatorTracked) {
+        simulatorTracked = true;
+        trackConversionEvent("simulador_carteira_iniciado", {
+          simulator_profile: activeProfile,
+        });
+      }
+    });
+    field.addEventListener("blur", () => {
+      field.value = String(getClientCount(field.dataset.portfolioField));
+      updatePortfolioSimulator();
+    });
+  });
+
+  simulatorCta.addEventListener("click", () => {
+    trackConversionEvent("simulador_carteira_cta", {
+      simulator_profile: activeProfile,
+    });
+
+    if (activeProfile === "referrer") {
+      openClientModal();
+      return;
+    }
+
+    document.getElementById("avaliacao")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  });
+
+  updatePortfolioSimulator();
+}
+
 // 03 · Prova social: carrossel e filtros
 // -----------------------------------------------------------------------------
 const proofSlider = document.getElementById("proofSlider");

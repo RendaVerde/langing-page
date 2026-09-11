@@ -9,8 +9,8 @@ qualificação de interessados e captação de leads.
   pela página.
 - `style.css`: identidade visual, componentes, estados, responsividade e ajustes
   finais de legibilidade.
-- `script.js`: quiz, prova social, vídeos, modais, cards expansíveis e envio dos
-  leads.
+- `script.js`: quiz, simulador de carteira, prova social, vídeos, modais, cards
+  expansíveis e envio dos leads.
 - `img/`: imagens institucionais e provas sociais.
 - `videos/`: vídeos locais e respectivas capas.
 
@@ -34,6 +34,11 @@ Os vídeos do YouTube dependem de `data-youtube-autoplay` no contêiner e de um
 `id` único no `iframe`. Os formulários dependem dos identificadores usados em
 `script.js`; por isso, qualquer alteração de `id` deve ser refletida nos dois
 arquivos.
+
+O simulador de carteira usa quantidades de clientes e bases ilustrativas fixas
+para facilitar a comparação entre os perfis Licenciado e Cliente que indica. As
+taxas e condições devem continuar acompanhadas do aviso sobre elegibilidade e
+regras vigentes.
 
 ## Convenções de manutenção
 

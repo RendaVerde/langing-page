@@ -656,6 +656,175 @@
         </div>
       </section>
 
+      <!-- 07.1 · Simulador de carteira recorrente -->
+      <section
+        class="portfolio-simulator-section dark-band"
+        id="simulador-carteira"
+        aria-labelledby="portfolioSimulatorTitle"
+      >
+        <div class="wrap">
+          <div class="section-head portfolio-simulator-head">
+            <div>
+              <span class="section-kicker">SIMULADOR DE CARTEIRA</span>
+              <h2 id="portfolioSimulatorTitle">
+                Conheça o potencial da
+                <span class="accent">sua carteira.</span>
+              </h2>
+            </div>
+            <p>
+              Escolha seu perfil e informe quantos clientes ativos imagina ter
+              em cada solução. A estimativa é atualizada na hora.
+            </p>
+          </div>
+
+          <div class="portfolio-simulator">
+            <fieldset class="portfolio-profile-selector">
+              <legend>Qual perfil você quer simular?</legend>
+              <div class="portfolio-profile-options">
+                <button
+                  class="portfolio-profile-button is-active"
+                  type="button"
+                  data-portfolio-profile="licensee"
+                  aria-pressed="true"
+                >
+                  Licenciado
+                </button>
+                <button
+                  class="portfolio-profile-button"
+                  type="button"
+                  data-portfolio-profile="referrer"
+                  aria-pressed="false"
+                >
+                  Cliente que indica
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="portfolio-rate-grid" aria-label="Valores da simulação">
+              <article class="portfolio-rate-card">
+                <span>ENERGIA</span>
+                <strong id="portfolioEnergyRate">2%–4%</strong>
+                <p id="portfolioEnergyNote">
+                  Conforme categoria de bônus e contrato.
+                </p>
+              </article>
+              <article class="portfolio-rate-card">
+                <span>TELECOM</span>
+                <strong id="portfolioTelecomRate">R$ 7,00</strong>
+                <p id="portfolioTelecomNote">Por conexão elegível e paga.</p>
+              </article>
+              <article class="portfolio-rate-card">
+                <span>SEGUROS</span>
+                <strong id="portfolioInsuranceRate">5%</strong>
+                <p id="portfolioInsuranceNote">
+                  Referência informada; confirme a regra vigente.
+                </p>
+              </article>
+            </div>
+
+            <div class="portfolio-profile-note" id="portfolioProfileNote">
+              Valores de geração própria usados como referência. Confirme a
+              categoria de bônus e as regras vigentes com o especialista.
+            </div>
+
+            <div class="portfolio-calculator">
+              <div class="portfolio-calculator-copy">
+                <span class="section-kicker">IMAGINE SUA CARTEIRA RECORRENTE</span>
+                <h3>Quantos clientes ativos você pretende construir?</h3>
+                <p id="portfolioAssumptions">
+                  Exemplo baseado em conta de energia de R$ 500,00 e seguro com
+                  base elegível de R$ 300,00 por cliente.
+                </p>
+              </div>
+
+              <div class="portfolio-field-grid">
+                <div class="portfolio-field">
+                  <label for="portfolioEnergyClients">Clientes de energia</label>
+                  <input
+                    id="portfolioEnergyClients"
+                    data-portfolio-field="energy"
+                    type="number"
+                    min="0"
+                    max="1000"
+                    step="1"
+                    value="10"
+                    inputmode="numeric"
+                    aria-describedby="portfolioAssumptions portfolioEstimateDisclaimer"
+                  />
+                </div>
+                <div class="portfolio-field">
+                  <label for="portfolioInsuranceClients"
+                    >Clientes de seguros</label
+                  >
+                  <input
+                    id="portfolioInsuranceClients"
+                    data-portfolio-field="insurance"
+                    type="number"
+                    min="0"
+                    max="1000"
+                    step="1"
+                    value="10"
+                    inputmode="numeric"
+                    aria-describedby="portfolioAssumptions portfolioEstimateDisclaimer"
+                  />
+                </div>
+                <div class="portfolio-field">
+                  <label for="portfolioTelecomClients">Clientes de telecom</label>
+                  <input
+                    id="portfolioTelecomClients"
+                    data-portfolio-field="telecom"
+                    type="number"
+                    min="0"
+                    max="1000"
+                    step="1"
+                    value="10"
+                    inputmode="numeric"
+                    aria-describedby="portfolioAssumptions portfolioEstimateDisclaimer"
+                  />
+                </div>
+              </div>
+
+              <div
+                class="portfolio-estimate"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                <div>
+                  <span>ESTIMATIVA MENSAL</span>
+                  <small>com pagamentos elegíveis</small>
+                </div>
+                <output id="portfolioEstimate">R$ 320,00 a R$ 420,00</output>
+              </div>
+
+              <p class="portfolio-breakdown" id="portfolioBreakdown">
+                Energia: R$ 100,00 a R$ 200,00 · Seguros: R$ 150,00 · Telecom:
+                R$ 70,00
+              </p>
+              <p class="portfolio-disclaimer" id="portfolioEstimateDisclaimer">
+                Cálculo ilustrativo, sem garantia de renda. O resultado depende
+                de clientes ativos, pagamentos, elegibilidade, categoria de
+                bônus e regras contratuais vigentes.
+              </p>
+
+              <button
+                class="btn btn-primary portfolio-simulator-cta"
+                id="portfolioSimulatorCta"
+                type="button"
+              >
+                ANALISAR COM UM ESPECIALISTA →
+              </button>
+            </div>
+          </div>
+
+          <noscript>
+            <p class="portfolio-noscript">
+              Ative o JavaScript para experimentar a simulação. Você também pode
+              seguir para a avaliação e conversar com um especialista.
+            </p>
+          </noscript>
+        </div>
+      </section>
+
       <!-- 08 · Prova social e resultados -->
       <section id="prova-social" class="social-section dark-band">
         <div class="wrap">

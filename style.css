@@ -1215,6 +1215,243 @@ h2 {
 .eco.is-open .eco-more {
   color: #fff;
 }
+
+/* 11.1 · Simulador de carteira recorrente
+   ========================================================================== */
+.portfolio-simulator-section {
+  padding-top: 82px;
+  padding-bottom: 82px;
+}
+
+.portfolio-simulator-head {
+  margin-bottom: 34px;
+}
+
+.portfolio-simulator-head h2 {
+  font-size: clamp(40px, 5.4vw, 66px);
+}
+
+.portfolio-simulator {
+  padding: 28px;
+  border: 1px solid rgba(0, 245, 114, 0.2);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(0, 245, 114, 0.08), transparent 28%),
+    linear-gradient(145deg, #0d1210, #090c0b);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+}
+
+.portfolio-profile-selector {
+  margin: 0 0 22px;
+  padding: 0;
+  border: 0;
+}
+
+.portfolio-profile-selector legend {
+  margin-bottom: 12px;
+  color: #d8e1da;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.portfolio-profile-options {
+  display: inline-flex;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.portfolio-profile-button {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.portfolio-profile-button:hover {
+  color: #fff;
+  border-color: rgba(0, 245, 114, 0.18);
+}
+
+.portfolio-profile-button.is-active {
+  color: #041108;
+  border-color: rgba(0, 245, 114, 0.7);
+  background: linear-gradient(90deg, var(--green), var(--green2));
+}
+
+.portfolio-profile-button:focus-visible,
+.portfolio-field input:focus-visible {
+  outline: 2px solid var(--green2);
+  outline-offset: 3px;
+}
+
+.portfolio-rate-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.portfolio-rate-card {
+  min-width: 0;
+  padding: 21px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.portfolio-rate-card > span,
+.portfolio-estimate span {
+  display: block;
+  color: var(--green2);
+  font-size: 15px;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+}
+
+.portfolio-rate-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 31px;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.portfolio-rate-card p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.portfolio-profile-note {
+  margin: 14px 0;
+  padding: 13px 15px;
+  border-left: 2px solid var(--green2);
+  background: rgba(0, 245, 114, 0.035);
+  color: #aebbb1;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.portfolio-calculator {
+  margin-top: 18px;
+  padding: 25px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(4, 8, 6, 0.56);
+}
+
+.portfolio-calculator-copy h3 {
+  margin: 7px 0 6px;
+  font-size: clamp(25px, 3vw, 34px);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.portfolio-calculator-copy p {
+  max-width: 820px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.portfolio-field-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.portfolio-field label {
+  display: block;
+  margin-bottom: 8px;
+  color: #d7e0d9;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.portfolio-field input {
+  width: 100%;
+  min-height: 50px;
+  padding: 11px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 11px;
+  background: #090d0b;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 750;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.portfolio-field input:hover {
+  border-color: rgba(0, 245, 114, 0.35);
+}
+
+.portfolio-estimate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.portfolio-estimate small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.portfolio-estimate output {
+  color: var(--green2);
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+  text-align: right;
+}
+
+.portfolio-breakdown,
+.portfolio-disclaimer,
+.portfolio-noscript {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.portfolio-breakdown {
+  margin: 14px 0 0;
+  color: #cbd5ce;
+}
+
+.portfolio-disclaimer {
+  margin: 14px 0 0;
+  color: var(--muted2);
+}
+
+.portfolio-simulator-cta {
+  margin-top: 22px;
+}
+
+.portfolio-noscript {
+  margin: 18px 0 0;
+}
+
 /* 12 · Prova social e carrossel
    ========================================================================== */
 .social-section {
@@ -2506,6 +2743,29 @@ body.client-modal-open {
     min-height: auto;
   }
 
+  .portfolio-rate-grid,
+  .portfolio-field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .portfolio-rate-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 7px 16px;
+    align-items: center;
+  }
+
+  .portfolio-rate-card strong {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin: 0;
+    text-align: right;
+  }
+
+  .portfolio-rate-card p {
+    margin: 0;
+  }
+
   .event-experience {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -2883,6 +3143,57 @@ body.client-modal-open {
 
   .eco p {
     font-size: 15px;
+  }
+
+  .portfolio-simulator-section {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  .portfolio-simulator-head h2 {
+    font-size: 42px;
+  }
+
+  .portfolio-simulator {
+    padding: 18px;
+    border-radius: 24px;
+  }
+
+  .portfolio-profile-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .portfolio-profile-button {
+    min-width: 0;
+    padding-inline: 10px;
+  }
+
+  .portfolio-rate-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .portfolio-rate-card strong {
+    font-size: 27px;
+  }
+
+  .portfolio-calculator {
+    padding: 20px 17px;
+  }
+
+  .portfolio-estimate {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .portfolio-estimate output {
+    text-align: left;
+  }
+
+  .portfolio-simulator-cta {
+    width: 100%;
   }
 
   /* desativa o hover como mecanismo de abertura */
