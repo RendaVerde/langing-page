@@ -300,12 +300,12 @@ async function submitLead() {
   const leadSaved = await saveLeadToSheet(licensedLead);
 
   if (leadSaved) {
-    trackConversionEvent("lead_salvo", {
+    trackConversionEvent("lead_envio_aceito", {
       lead_type: "licenciado",
       lead_route: licensedLead.rota_resultado,
     });
   } else {
-    trackConversionEvent("lead_salvamento_falhou", {
+    trackConversionEvent("lead_envio_falhou", {
       lead_type: "licenciado",
     });
     showToast("Siga pelo WhatsApp para concluir seu atendimento.");
@@ -326,7 +326,7 @@ async function submitLead() {
     const whatsappResultText = document.getElementById("whatsappResultText");
 
     if (whatsappResultText) {
-      whatsappResultText.textContent = `${lead.nome}, registramos sua pré-avaliação. Agora você pode conversar com um especialista e entender a oportunidade com mais detalhes.`;
+      whatsappResultText.textContent = `${lead.nome}, sua pré-avaliação está pronta. Agora você pode conversar com um especialista e entender a oportunidade com mais detalhes.`;
     }
 
     const whatsappBtn = document.getElementById("whatsappBtn");
@@ -1248,9 +1248,9 @@ clientLeadForm?.addEventListener("submit", async (event) => {
   const leadSaved = await saveLeadToSheet(sheetLead);
 
   if (leadSaved) {
-    trackConversionEvent("lead_salvo", { lead_type: "cliente" });
+    trackConversionEvent("lead_envio_aceito", { lead_type: "cliente" });
   } else {
-    trackConversionEvent("lead_salvamento_falhou", { lead_type: "cliente" });
+    trackConversionEvent("lead_envio_falhou", { lead_type: "cliente" });
   }
 
   trackConversionEvent("whatsapp_aberto", { lead_type: "cliente" });
@@ -1385,12 +1385,12 @@ eventLeadForm?.addEventListener("submit", async (event) => {
   const leadSaved = await saveLeadToSheet(sheetLead);
 
   if (leadSaved) {
-    trackConversionEvent("lead_salvo", {
+    trackConversionEvent("lead_envio_aceito", {
       lead_type: "evento",
       event_interest: interest,
     });
   } else {
-    trackConversionEvent("lead_salvamento_falhou", { lead_type: "evento" });
+    trackConversionEvent("lead_envio_falhou", { lead_type: "evento" });
   }
 
   trackConversionEvent("whatsapp_aberto", { lead_type: "evento" });
@@ -1498,27 +1498,36 @@ async function saveLeadToSheet(data) {
   const formData = new URLSearchParams();
   formData.set("payload", JSON.stringify(payload));
 
-  // sendBeacon preserva o envio mesmo quando a página redireciona em seguida.
+  // O Beacon confirma apenas que o navegador aceitou enfileirar o envio.
   if (navigator.sendBeacon) {
-    const queued = navigator.sendBeacon(CONFIG.sheetEndpoint, formData);
-
-    if (queued) {
-      return true;
+    try {
+      if (navigator.sendBeacon(CONFIG.sheetEndpoint, formData)) return true;
+    } catch (error) {
+      console.warn("Beacon indisponível; tentando POST:", error);
     }
   }
 
   // Fallback para navegadores que não conseguiram enfileirar o Beacon.
+  const controller =
+    typeof AbortController !== "undefined" ? new AbortController() : null;
+  const timeout = controller
+    ? window.setTimeout(() => controller.abort(), 8000)
+    : null;
   try {
-    await fetch(CONFIG.sheetEndpoint, {
+    const response = await fetch(CONFIG.sheetEndpoint, {
       method: "POST",
       mode: "no-cors",
       body: formData,
       keepalive: true,
+      ...(controller ? { signal: controller.signal } : {}),
     });
-
+    // Respostas opacas não permitem afirmar que o Apps Script gravou a linha.
+    if (response.type !== "opaque" && !response.ok) return false;
     return true;
   } catch (error) {
     console.error("Falha ao enviar lead:", error);
     return false;
+  } finally {
+    if (timeout !== null) window.clearTimeout(timeout);
   }
 }

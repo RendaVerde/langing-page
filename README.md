@@ -26,6 +26,13 @@ As configurações externas ficam concentradas no objeto `CONFIG`, no início de
 - número do atendimento por WhatsApp;
 - endpoint e identificador usados no envio para o Google Sheets.
 
+O receptor do Apps Script e as instruções de implantação na planilha existente
+estão em [`integrations/google-sheets/README.md`](integrations/google-sheets/README.md).
+O código remoto não acompanha a LP: um commit neste repositório não atualiza
+automaticamente a implantação `/exec`. Os eventos `lead_envio_aceito` indicam
+transporte aceito pelo navegador; a gravação deve ser conferida na planilha ou
+nas execuções do Apps Script.
+
 O Microsoft Clarity é carregado de forma assíncrona no `<head>` de `index.html`
 com o identificador público do projeto. Formulários e resultados personalizados
 utilizam `data-clarity-mask="true"` para reforçar a proteção dos dados dos leads.
@@ -58,6 +65,10 @@ Execute `node tools/validate-page.js` para verificar automaticamente:
 - estrutura básica do HTML e IDs duplicados;
 - associações entre labels, campos e referências do JavaScript;
 - existência dos arquivos locais usados pela página.
+
+Execute também `node --test tools/test-licensee-sheets.cjs` para verificar o
+contrato de envio e o roteamento para as abas de licenciados e clientes em uma
+planilha simulada, sem transmitir cadastros reais.
 
 Além da validação automática, recomenda-se:
 
